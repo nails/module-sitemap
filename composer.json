@@ -1,10 +1,17 @@
 {
 	"name": "nailsapp/module-sitemap",
-	"keywords": ["Nails","Shed Collective","CodeIgniter", "Sitemap Module"],
+	"keywords":
+	[
+		"Nails",
+		"Shed Collective",
+		"CodeIgniter",
+		"Sitemap Module"
+	],
 	"homepage": "http://nailsapp.co.uk/modules/sitemap",
 	"description": "This the \"Sitemap\" module for Nails.",
-	"license":"MIT",
-	"authors": [
+	"license": "MIT",
+	"authors":
+	[
 		{
 			"name": "Pablo de la Pena",
 			"email": "p@shedcollective.org",
@@ -18,12 +25,12 @@
 			"role": "Developer"
 		}
 	],
-	"support": {
+	"support":
+	{
 		"email": "hello@shedcollective.org"
 	},
 	"require":
 	{
-		"php": ">=5.4.0",
 		"nailsapp/common" : "dev-develop"
 	}
 }
