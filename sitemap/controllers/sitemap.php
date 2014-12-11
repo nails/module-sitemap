@@ -93,7 +93,7 @@ class NAILS_Sitemap extends NAILS_Controller
 			$this->output->set_header( 'Retry-After: 7200' );
 
 			//	Inform devs
-			send_developer_mail( $this->_filename_json . ' contained no data' , 'The cache file for the site map was found but did not contain any data.' );
+			sendDeveloperMail($this->_filename_json . ' contained no data' , 'The cache file for the site map was found but did not contain any data.');
 
 			$this->load->view( 'sitemap/error' );
 			return FALSE;
@@ -195,7 +195,7 @@ class NAILS_Sitemap extends NAILS_Controller
 				_LOG( 'Failed to generate sitemap: ' . $this->sitemap_model->last_error() );
 
 				//	Let the dev's know too, this could be serious
-				send_developer_mail( 'Failed to generate sitemap', 'There was no ' . $file . ' data in the cache and I failed to recreate it.' );
+				sendDeveloperMail('Failed to generate sitemap', 'There was no ' . $file . ' data in the cache and I failed to recreate it.');
 
 				//	Send a temporarily unavailable header, we don't want search engines unlisting us because of this.
 				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
