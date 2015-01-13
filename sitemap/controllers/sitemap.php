@@ -29,7 +29,7 @@ class NAILS_Sitemap extends NAILS_Controller
 		// --------------------------------------------------------------------------
 
 		//	Enabled?
-		if ( ! module_is_enabled( 'sitemap' ) ) :
+		if ( ! isModuleEnabled( 'sitemap' ) ) :
 
 			show_404();
 

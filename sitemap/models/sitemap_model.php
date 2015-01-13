@@ -201,7 +201,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 	protected function _generator_cms()
 	{
-		if ( module_is_enabled( 'cms' ) ) :
+		if ( isModuleEnabled( 'cms' ) ) :
 
 			$_map = array();
 
@@ -243,7 +243,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 	protected function _generator_blog()
 	{
-		if ( module_is_enabled( 'blog' ) ) :
+		if ( isModuleEnabled( 'blog' ) ) :
 
 			$_map = array();
 
@@ -299,7 +299,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 	protected function _generator_shop()
 	{
-		if ( module_is_enabled( 'shop' ) ) :
+		if ( isModuleEnabled( 'shop' ) ) :
 
 			//	TODO: all shop product/category/tag/sale routes etc
 
