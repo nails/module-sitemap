@@ -82,7 +82,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 		$_map->meta->generated	= date( DATE_ATOM );
 		$_map->pages			= array();
 
-		foreach ( $this->_writers AS $slug => $method ) :
+		foreach ( $this->_writers as $slug => $method ) :
 
 			if ( is_callable( array( $method[0], $method[1] ) ) ) :
 
@@ -212,7 +212,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 			$_pages		= $this->cms_page_model->get_all();
 			$_counter	= 0;
 
-			foreach ( $_pages AS $page ) :
+			foreach ( $_pages as $page ) :
 
 				if ( $page->is_published && ! $page->is_homepage ) :
 
@@ -268,7 +268,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
 			// --------------------------------------------------------------------------
 
-			foreach ( $_posts AS $post ) :
+			foreach ( $_posts as $post ) :
 
 				if ( $post->is_published ) :
 

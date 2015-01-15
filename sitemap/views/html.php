@@ -11,7 +11,7 @@
 					$_bc = $sitemap->pages[$i]->breadcrumbs;
 					array_pop( $_bc );
 
-					foreach ( $_bc AS $crumb ) :
+					foreach ( $_bc as $crumb ) :
 
 						echo '<span class="crumb">' . $crumb->title . '</span> ';
 
