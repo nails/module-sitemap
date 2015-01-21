@@ -1,222 +1,240 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
 /**
-* Name:			Sitemap
-*
-* Description:	Generates a sitemap in various formats
-*
-*/
-
-/**
- * OVERLOADING NAILS' SITEMAP MODULE
+ * This class is the sitemap controller. It produces the various site maps supported by Nails.
  *
- * Note the name of this class; done like this to allow apps to extend this class.
- * Read full explanation at the bottom of this file.
- *
- **/
+ * @package     Nails
+ * @subpackage  module-sitemap
+ * @category    Controller
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class NAILS_Sitemap extends NAILS_Controller
 {
-	protected $_filename_json;
-	protected $_filename_xml;
+    protected $filenameJson;
+    protected $filenameXml;
 
-	// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-	public function __construct()
-	{
-		parent::__construct();
+    /**
+     * Construct the controller
+     */
+    public function __construct()
+    {
+        parent::__construct();
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	Enabled?
-		if ( ! isModuleEnabled( 'sitemap' ) ) :
+        //  Enabled?
+        if (!isModuleEnabled('sitemap')) {
 
-			show_404();
+            show_404();
+        }
 
-		endif;
+        // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+        $this->load->model('sitemap/sitemap_model');
 
-		$this->load->model( 'sitemap/sitemap_model' );
+        $this->filenameJson  = $this->sitemap_model->get_filename_json();
+        $this->_filename_xml = $this->sitemap_model->get_filename_xml();
+    }
 
-		$this->_filename_json	= $this->sitemap_model->get_filename_json();
-		$this->_filename_xml	= $this->sitemap_model->get_filename_xml();
-	}
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Map all requests to _sitemap
+     * @return  void
+     **/
+    public function _remap()
+    {
+        switch (uri_string()) {
 
+            case 'sitemap':
 
-	/**
-	 * Map all requests to _sitemap
-	 *
-	 * @access	public
-	 * @param	none
-	 * @return	void
-	 **/
-	public function _remap()
-	{
-		switch( uri_string() ) :
+                $this->outputHtml();
+                break;
 
-			case 'sitemap' :				$this->_output_html();	break;
-			case $this->_filename_xml :		$this->_output_xml();	break;
-			case $this->_filename_json :	$this->_output_json();	break;
-			default :						show_404();				break;
+            case $this->_filename_xml:
 
-		endswitch;
-	}
+                $this->outputXml();
+                break;
 
+            case $this->filenameJson:
 
-	// --------------------------------------------------------------------------
+                $this->outputJson();
+                break;
 
+            default:
 
-	protected function _output_html()
-	{
-		//	Check cache for $this->_filename_json
-		if ( ! $this->_check_cache( $this->_filename_json ) ) :
+                show_404();
+                break;
+        }
+    }
 
-			return;
+    // --------------------------------------------------------------------------
 
-		endif;
+    /**
+     * Generates a HTML, human friendly sitemap
+     * @return void
+     */
+    protected function outputHtml()
+    {
+        //  Check cache for $this->filenameJson
+        if (!$this->checkCache($this->filenameJson)) {
 
-		// --------------------------------------------------------------------------
+            return;
+        }
 
-		$this->data['sitemap'] = json_decode( file_get_contents( DEPLOY_CACHE_DIR . $this->_filename_json ) );
+        // --------------------------------------------------------------------------
 
-		if ( empty( $this->data['sitemap'] ) ) :
+        $this->data['sitemap'] = json_decode(file_get_contents(DEPLOY_CACHE_DIR . $this->filenameJson));
 
-			//	Something fishy goin' on.
-			//	Send a temporarily unavailable header, we don't want search engines
-			//	unlisting us because of this.
+        if (empty($this->data['sitemap'])) {
 
-			$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
-			$this->output->set_header( 'Status: 503 Service Temporarily Unavailable' );
-			$this->output->set_header( 'Retry-After: 7200' );
+            /**
+             * Something fishy goin' on.
+             * Send a temporarily unavailable header, we don't want search engines
+             * unlisting us because of this.
+             */
 
-			//	Inform devs
-			sendDeveloperMail($this->_filename_json . ' contained no data' , 'The cache file for the site map was found but did not contain any data.');
+            $this->output->set_header($this->input->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+            $this->output->set_header('Status: 503 Service Temporarily Unavailable');
+            $this->output->set_header('Retry-After: 7200');
 
-			$this->load->view( 'sitemap/error' );
-			return FALSE;
+            //  Inform devs
+            $subject = $this->filenameJson . ' contained no data';
+            $message = 'The cache file for the site map was found but did not contain any data.';
+            sendDeveloperMail($subject, $message);
 
-		endif;
+            $this->load->view('sitemap/error');
+            return false;
+        }
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	Page data
-		$this->data['page']->title = 'Site Map';
+        //  Page data
+        $this->data['page']->title = 'Site Map';
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		$this->load->view( 'structure/header',	$this->data );
-		$this->load->view( 'sitemap/html',		$this->data );
-		$this->load->view( 'structure/footer',	$this->data );
-	}
+        $this->load->view('structure/header', $this->data);
+        $this->load->view('sitemap/html', $this->data);
+        $this->load->view('structure/footer', $this->data);
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Generates a XML, machine friendly sitemap
+     * @return void
+     */
+    protected function outputXml()
+    {
+        //  Check cache for $this->_filename_xml
+        if (!$this->checkCache($this->_filename_xml)) {
 
+            return;
+        }
 
-	protected function _output_xml()
-	{
-		//	Check cache for $this->_filename_xml
-		if ( ! $this->_check_cache( $this->_filename_xml ) ) :
+        // --------------------------------------------------------------------------
 
-			return;
+        //  Set XML headers
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Content-type: text/xml');
+        header('Pragma: no-cache');
 
-		endif;
+        readfile(DEPLOY_CACHE_DIR . $this->_filename_xml);
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		//	Set XML headers
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Content-type: text/xml' );
-		header( 'Pragma: no-cache' );
+        /**
+         * Kill script, th, th, that's all folks.
+         * Stop the output class from hijacking our headers and setting an incorrect
+         * Content-Type
+         */
 
-		readfile( DEPLOY_CACHE_DIR . $this->_filename_xml );
+        exit(0);
+    }
 
-		// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-		//	Kill script, th, th, that's all folks.
-		//	Stop the output class from hijacking our headers and
-		//	setting an incorrect Content-Type
+    /**
+     * Generates a JSON, machine friendly sitemap
+     * @return void
+     */
+    protected function outputJson()
+    {
+        //  Check cache for $this->filenameJson
+        if (!$this->checkCache($this->filenameJson)) {
 
-		exit(0);
-	}
+            return;
+        }
 
+        // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+        //  Set JSON headers
+        header('Cache-Control: no-store, no-cache, must-revalidate');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Content-type: application/json');
+        header('Pragma: no-cache');
 
+        //  Stream
+        readfile(DEPLOY_CACHE_DIR . $this->filenameJson);
 
-	protected function _output_json()
-	{
-		//	Check cache for $this->_filename_json
-		if ( ! $this->_check_cache( $this->_filename_json ) ) :
+        // --------------------------------------------------------------------------
 
-			return;
+        /**
+         * Kill script, th, th, that's all folks.
+         * Stop the output class from hijacking our headers and setting an incorrect
+         * Content-Type
+         */
 
-		endif;
+        exit(0);
+    }
 
-		// --------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
 
-		//	Set JSON headers
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Expires: Mon, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Content-type: application/json' );
-		header( 'Pragma: no-cache' );
+    /**
+     * Checks for a cached file, if not found attempts to generate it
+     * @param  string $file The cache file to check
+     * @return boolean
+     */
+    protected function checkCache($file)
+    {
+        //  Check cache for $file
+        if (!is_file(DEPLOY_CACHE_DIR . $file)) {
 
-		//	Stream
-		readfile( DEPLOY_CACHE_DIR . $this->_filename_json );
+            //  If not found, generate
+            $this->load->model('sitemap/sitemap_model');
 
-		// --------------------------------------------------------------------------
+            if (!$this->sitemap_model->generate()) {
 
-		//	Kill script, th, th, that's all folks.
-		//	Stop the output class from hijacking our headers and
-		//	setting an incorrect Content-Type
+                //  Failed to generate sitemap
+                _LOG('Failed to generate sitemap: ' . $this->sitemap_model->last_error());
 
-		exit(0);
-	}
+                //  Let the dev's know too, this could be serious
+                $subject = 'Failed to generate sitemap';
+                $message = 'There was no ' . $file . ' data in the cache and I failed to recreate it.';
+                sendDeveloperMail($subject, $message);
 
+                //  Send a temporarily unavailable header, we don't want search engines unlisting us because of this.
+                $protocol = $this->input->server('SERVER_PROTOCOL');
+                $this->output->set_header($protocol . ' 503 Service Temporarily Unavailable');
+                $this->output->set_header('Status: 503 Service Temporarily Unavailable');
+                $this->output->set_header('Retry-After: 7200');
 
-	// --------------------------------------------------------------------------
+                $this->load->view('sitemap/error');
+                return false;
+            }
+        }
 
-
-	protected function _check_cache( $file )
-	{
-		//	Check cache for $file
-		if ( ! is_file( DEPLOY_CACHE_DIR . $file ) ) :
-
-			//	If not found, generate
-			$this->load->model( 'sitemap/sitemap_model' );
-
-			if ( ! $this->sitemap_model->generate() ) :
-
-				//	Failed to generate sitemap
-				_LOG( 'Failed to generate sitemap: ' . $this->sitemap_model->last_error() );
-
-				//	Let the dev's know too, this could be serious
-				sendDeveloperMail('Failed to generate sitemap', 'There was no ' . $file . ' data in the cache and I failed to recreate it.');
-
-				//	Send a temporarily unavailable header, we don't want search engines unlisting us because of this.
-				$this->output->set_header( $this->input->server( 'SERVER_PROTOCOL' ) . ' 503 Service Temporarily Unavailable' );
-				$this->output->set_header( 'Status: 503 Service Temporarily Unavailable' );
-				$this->output->set_header( 'Retry-After: 7200' );
-
-				$this->load->view( 'sitemap/error' );
-				return FALSE;
-
-			endif;
-
-		endif;
-
-		return TRUE;
-	}
-
+        return true;
+    }
 }
 
-
 // --------------------------------------------------------------------------
-
 
 /**
  * OVERLOADING NAILS' EMAIL MODULES
@@ -242,14 +260,9 @@ class NAILS_Sitemap extends NAILS_Controller
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SITEMAP' ) ) :
+if (!defined('NAILS_ALLOW_EXTENSION_SITEMAP')) {
 
-	class Sitemap extends NAILS_Sitemap
-	{
-	}
-
-endif;
-
-
-/* End of file sitemap.php */
-/* Location: ./application/modules/sitemap/controllers/sitemap.php */
+    class Sitemap extends NAILS_Sitemap
+    {
+    }
+}
