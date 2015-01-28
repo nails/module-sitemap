@@ -27,7 +27,7 @@ class NAILS_Sitemap extends NAILS_Controller
         // --------------------------------------------------------------------------
 
         //  Enabled?
-        if (!isModuleEnabled('sitemap')) {
+        if (!isModuleEnabled('nailsapp/module-sitemap')) {
 
             show_404();
         }
@@ -36,8 +36,8 @@ class NAILS_Sitemap extends NAILS_Controller
 
         $this->load->model('sitemap/sitemap_model');
 
-        $this->filenameJson  = $this->sitemap_model->get_filename_json();
-        $this->_filename_xml = $this->sitemap_model->get_filename_xml();
+        $this->filenameJson = $this->sitemap_model->getFilenameJson();
+        $this->filenameXml  = $this->sitemap_model->getFilenameXml();
     }
 
     // --------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class NAILS_Sitemap extends NAILS_Controller
                 $this->outputHtml();
                 break;
 
-            case $this->_filename_xml:
+            case $this->filenameXml:
 
                 $this->outputXml();
                 break;
@@ -131,8 +131,8 @@ class NAILS_Sitemap extends NAILS_Controller
      */
     protected function outputXml()
     {
-        //  Check cache for $this->_filename_xml
-        if (!$this->checkCache($this->_filename_xml)) {
+        //  Check cache for $this->filenameXml
+        if (!$this->checkCache($this->filenameXml)) {
 
             return;
         }
@@ -145,7 +145,7 @@ class NAILS_Sitemap extends NAILS_Controller
         header('Content-type: text/xml');
         header('Pragma: no-cache');
 
-        readfile(DEPLOY_CACHE_DIR . $this->_filename_xml);
+        readfile(DEPLOY_CACHE_DIR . $this->filenameXml);
 
         // --------------------------------------------------------------------------
 

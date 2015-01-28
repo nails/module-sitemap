@@ -1,329 +1,351 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
 
 /**
- * Name:		NAILS_Sitemap_model
+ * This class provides some common admin controller functionality
  *
- * Description:	This model handles the generation of sitemaps
- *
- **/
-
-/**
- * OVERLOADING NAILS' MODELS
- *
- * Note the name of this class; done like this to allow apps to extend this class.
- * Read full explanation at the bottom of this file.
- *
- **/
+ * @package     Nails
+ * @subpackage  module-sitemap
+ * @category    Model
+ * @author      Nails Dev Team
+ * @link
+ */
 
 class NAILS_Sitemap_model extends NAILS_Model
 {
-	protected $_writers;
-	protected $_filename_json;
-	protected $_filename_xml;
+    protected $writers;
+    protected $filenameJson;
+    protected $filenameXml;
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Construct the model
+     */
+    public function __construct()
+    {
+        parent::__construct();
 
+        // --------------------------------------------------------------------------
 
-	public function __construct()
-	{
-		parent::__construct();
+        //  Set Defaults
+        $this->writers      = array();
+        $this->filenameJson = 'sitemap.json';
+        $this->filenameXml  = 'sitemap.xml';
 
-		// --------------------------------------------------------------------------
+        //  Default writers
+        $this->writers['static'] = array($this, 'generatorStatic');
+        $this->writers['cms']    = array($this, 'generatorCms');
+        $this->writers['blog']   = array($this, 'generatorBlog');
+        $this->writers['shop']   = array($this, 'generatorShop');
+    }
 
-		//	Set Defaults
-		$this->_writers				= array();
-		$this->_filename_json		= 'sitemap.json';
-		$this->_filename_xml		= 'sitemap.xml';
+    // --------------------------------------------------------------------------
 
-		//	Default writers
-		$this->_writers['static']	= array( $this, '_generator_static' );
-		$this->_writers['cms']		= array( $this, '_generator_cms' );
-		$this->_writers['blog']		= array( $this, '_generator_blog' );
-		$this->_writers['shop']		= array( $this, '_generator_shop' );
-	}
+    /**
+     * Returns the JSON filename
+     * @return string
+     */
+    public function getFilenameJson()
+    {
+        return $this->filenameJson;
+    }
 
+    // --------------------------------------------------------------------------
 
-	// --------------------------------------------------------------------------
+    /**
+     * Returns the XML filename
+     * @return string
+     */
+    public function getFilenameXml()
+    {
+        return $this->filenameXml;
+    }
 
+    // --------------------------------------------------------------------------
 
-	public function get_filename_json()
-	{
-		return $this->_filename_json;
-	}
+    /**
+     * Generates the various site maps
+     * @return boolean
+     */
+    public function generate()
+    {
+        //  Will we be able to write to the cache?
+        if (!is_writable(DEPLOY_CACHE_DIR)) {
 
+            $this->_set_error('Cache is not writeable.');
+            return false;
+        }
 
-	// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
+        $map                  = new stdClass();
+        $map->meta            = new stdClass();
+        $map->meta->generated = date(DATE_ATOM);
+        $map->pages           = array();
 
-	public function get_filename_xml()
-	{
-		return $this->_filename_xml;
-	}
+        foreach ($this->writers as $slug => $method) {
 
+            if (is_callable(array($method[0], $method[1]))) {
 
-	// --------------------------------------------------------------------------
+                $result = call_user_func(array($method[0], $method[1]));
 
+                if (is_array($result)) {
 
-	public function generate()
-	{
-		//	Will we be able to write to the cache?
-		if ( ! is_writable( DEPLOY_CACHE_DIR ) ) :
+                    $map->pages = array_merge($map->pages, $result);
+                }
+            }
+        }
 
-			$this->_set_error( 'Cache is not writeable.' );
-			return FALSE;
+        // --------------------------------------------------------------------------
 
-		endif;
+        //  Sort the array into a vaguely sensible order
+        $this->load->helper('array');
+        array_sort_multi($map->pages, 'location');
 
-		// --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
 
-		$_map					= new stdClass();
-		$_map->meta				= new stdClass();
-		$_map->meta->generated	= date( DATE_ATOM );
-		$_map->pages			= array();
+        //  Save this data as JSON and XML files
+        $this->load->helper('file');
 
-		foreach ( $this->_writers as $slug => $method ) :
+        //  Write JSON sitemap
+        if (!$this->writeJson($map)) {
 
-			if ( is_callable( array( $method[0], $method[1] ) ) ) :
+            return false;
+        }
 
-				$_result = call_user_func( array( $method[0], $method[1] ) );
+        //  Write XML sitemap
+        if (!$this->writeXml($map)) {
 
-				if ( is_array( $_result ) ) :
+            return false;
+        }
 
-					$_map->pages = array_merge( $_map->pages, $_result );
+        return true;
+    }
 
-				endif;
+    // --------------------------------------------------------------------------
 
-			endif;
+    /**
+     * Generate site map entries for static pages
+     * @return array
+     */
+    protected function generatorStatic()
+    {
+        $map = array();
 
-		endforeach;
+        // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+        $map[0]              = new stdClass();
+        $map[0]->title       = 'Homepage';
+        $map[0]->location    = site_url();
+        $map[0]->breadcrumbs = '';
+        $map[0]->changefreq  = 'daily';
+        $map[0]->priority    = 1;
 
-		//	Sort the array into a vaguely sensible order
-		$this->load->helper( 'array' );
-		array_sort_multi( $_map->pages, 'location' );
+        // --------------------------------------------------------------------------
 
-		// --------------------------------------------------------------------------
+        return $map;
+    }
 
-		//	Save this data as JSON and XML files
-		$this->load->helper( 'file' );
+    // --------------------------------------------------------------------------
 
-		//	JSON, easy
-		if ( ! write_file( DEPLOY_CACHE_DIR . $this->_filename_json, json_encode( $_map ) ) ) :
+    /**
+     * Generate site map entries for CMS Pages
+     * @return array
+     */
+    protected function generatorCms()
+    {
+        if (isModuleEnabled('nailsapp/module-cms')) {
 
-			$this->_set_error( 'Failed to write ' . $this->_filename_json . '.' );
-			return FALSE;
+            $map = array();
 
-		endif;
+            $this->load->model('cms/cms_page_model');
 
-		//	XML file is a little more complex
-		$_fh = fopen( DEPLOY_CACHE_DIR . $this->_filename_xml, 'w' );
+            $pages   = $this->cms_page_model->get_all();
+            $counter = 0;
 
-		if (  ! $_fh ) :
+            foreach ($pages as $page) {
 
-			$this->_set_error( 'Failed to write ' . $this->_filename_xml . ': Could not open file for writing.' );
-			return FALSE;
+                if ($page->is_published && !$page->is_homepage) {
 
-		endif;
+                    $map[$counter]              = new stdClass();
+                    $map[$counter]->title       = htmlentities($page->published->title);
+                    $map[$counter]->breadcrumbs = $page->published->breadcrumbs;
+                    $map[$counter]->location    = site_url($page->published->slug);
+                    $map[$counter]->lastmod     = date(DATE_ATOM, strtotime($page->modified));
+                    $map[$counter]->changefreq  = 'monthly';
+                    $map[$counter]->priority    = 0.5;
+                }
 
-		$_xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-		$_xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'. "\n";
+                $counter++;
+            }
+
+            return $map;
+        }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Generate site map entries for Blog posts
+     * @return array
+     */
+    protected function generatorBlog()
+    {
+        if (isModuleEnabled('nailsapp/module-blog')) {
+
+            $map = array();
+
+            $this->load->model('blog/blog_model');
+            $this->load->model('blog/blog_post_model');
+
+            $blogs = $this->blog_model->get_all();
+
+            foreach ($blogs as $blog) {
+
+                //  Only published items which are not schduled for the future
+                $data            = array();
+                $data['where']   = array();
+                $data['where'][] = array('column' => 'blog_id',      'value' => $blog->id);
+                $data['where'][] = array('column' => 'is_published', 'value' => true);
+                $data['where'][] = array('column' => 'published <=', 'value' => 'NOW()', 'escape' => false);
 
-		if ( fwrite( $_fh, $_xml ) ) :
+                $posts   = $this->blog_post_model->get_all(null, null, $data);
+                $counter = 0;
 
-			for ( $i = 0; $i < count( $_map->pages ); $i++ ) :
+                //  Blog front page route
+                $map[$counter]             = new stdClass();
+                $map[$counter]->title      = htmlentities($blog->label);
+                $map[$counter]->location   = $this->blog_model->getBlogUrl($blog->id);
+                $map[$counter]->changefreq = 'daily';
+                $map[$counter]->priority   = 0.5;
 
-				$_xml  = '<url>' . "\n";
-				$_xml .= '<loc>' . $_map->pages[$i]->location . '</loc>'. "\n";
-				$_xml .= ! empty( $_map->pages[$i]->lastmod )		? '<lastmod>' . $_map->pages[$i]->lastmod . '</lastmod>' . "\n"			: '';
-				$_xml .= ! empty( $_map->pages[$i]->changefreq )	? '<changefreq>' . $_map->pages[$i]->changefreq. '</changefreq>' . "\n"	: '';
-				$_xml .= ! empty( $_map->pages[$i]->priority )		? '<priority>' . $_map->pages[$i]->priority. '</priority>' . "\n"		: '';
-				$_xml .= '</url>'. "\n";
+                $counter++;
 
-				if ( ! fwrite( $_fh, $_xml ) ) :
+                foreach ($posts as $post) {
+
+                    $map[$counter]             = new stdClass();
+                    $map[$counter]->title      = htmlentities($post->title);
+                    $map[$counter]->location   = $post->url;
+                    $map[$counter]->lastmod    = date(DATE_ATOM, strtotime($post->modified));
+                    $map[$counter]->changefreq = 'monthly';
+                    $map[$counter]->priority   = 0.5;
 
-					@unlink( DEPLOY_CACHE_DIR . $this->_filename_xml );
-					$this->_set_error( 'Failed to write ' . $this->_filename_xml . ': Could write to file - #2.' );
-					return FALSE;
+                    $counter++;
+                }
+            }
+
+            return $map;
+        }
+    }
 
-				endif;
+    // --------------------------------------------------------------------------
 
-			endfor;
+    /**
+     * Generate site map entries for Shop items
+     * @return array
+     */
+    protected function generatorShop()
+    {
+        if (isModuleEnabled('nailsapp/module-shop')) {
 
-			//	finally, close <urlset>
-			$_xml = '</urlset>' . "\n";
+            // @TODO: all shop product/category/tag/sale routes etc
+        }
+    }
 
-			if ( ! fwrite( $_fh, $_xml ) ) :
+    // --------------------------------------------------------------------------
 
-				@unlink( DEPLOY_CACHE_DIR . $this->_filename_xml );
-				$this->_set_error( 'Failed to write ' . $this->_filename_xml . ': Could write to file - #3.' );
-				return FALSE;
+    /**
+     * Get all the routes where the sitemap exists
+     *
+     * @return array
+     */
+    public function getRoutes()
+    {
+        $routes                      = array();
+        $routes['sitemap']           = 'sitemap/sitemap';
+        $routes[$this->filenameXml]  = 'sitemap/sitemap';
+        $routes[$this->filenameJson] = 'sitemap/sitemap';
 
-			endif;
+        return $routes;
+    }
 
-			return TRUE;
+    // --------------------------------------------------------------------------
 
-		else :
+    /**
+     * Generates the JSON sitemap
+     * @param  stdClass $map The sitemap data
+     * @return boolean
+     */
+    protected function writeJson($map)
+    {
+        if (!@write_file(DEPLOY_CACHE_DIR . $this->filenameJson, json_encode($map))) {
 
-			@unlink( DEPLOY_CACHE_DIR . $this->_filename_xml );
-			$this->_set_error( 'Failed to write ' . $this->_filename_xml . ': Could write to file - #1.' );
-			return FALSE;
+            $this->_set_error('Failed to write ' . $this->filenameJson . '.');
+            return false;
+        }
+    }
 
-		endif;
-	}
+    // --------------------------------------------------------------------------
 
+    /**
+     * Generates the XML sitemap
+     * @param  stdClass $map The sitemap data
+     * @return boolean
+     */
+    protected function writeXml($map)
+    {
+        $fh = fopen(DEPLOY_CACHE_DIR . $this->filenameXml, 'w');
 
-	// --------------------------------------------------------------------------
+        if (!$fh) {
 
+            $this->_set_error('Failed to write ' . $this->filenameXml . ': Could not open file for writing.');
+            return false;
+        }
 
-	protected function _generator_static()
-	{
-		$_map = array();
+        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'. "\n";
 
-		// --------------------------------------------------------------------------
+        if (fwrite($fh, $xml)) {
 
-		$_map[0]				= new stdClass();
-		$_map[0]->title			= 'Homepage';
-		$_map[0]->location		= site_url();
-		$_map[0]->breadcrumbs	= '';
-		$_map[0]->changefreq	= 'daily';
-		$_map[0]->priority		= 1;
+            for ($i = 0; $i < count($map->pages); $i++) {
 
-		// --------------------------------------------------------------------------
+                $xml  = '<url>' . "\n";
+                $xml .= '<loc>' . $map->pages[$i]->location . '</loc>'. "\n";
+                $xml .= !empty($map->pages[$i]->lastmod)    ? '<lastmod>' . $map->pages[$i]->lastmod . '</lastmod>' . "\n"         : '';
+                $xml .= !empty($map->pages[$i]->changefreq) ? '<changefreq>' . $map->pages[$i]->changefreq. '</changefreq>' . "\n" : '';
+                $xml .= !empty($map->pages[$i]->priority)   ? '<priority>' . $map->pages[$i]->priority. '</priority>' . "\n"       : '';
+                $xml .= '</url>'. "\n";
 
-		return $_map;
-	}
+                if (!fwrite($fh, $xml)) {
 
+                    @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
+                    $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #2.');
+                    return false;
+                }
+            }
 
-	// --------------------------------------------------------------------------
+            //  finally, close <urlset>
+            $xml = '</urlset>' . "\n";
 
+            if (!fwrite($fh, $xml)) {
 
-	protected function _generator_cms()
-	{
-		if ( isModuleEnabled( 'cms' ) ) :
+                @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
+                $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #3.');
+                return false;
+            }
 
-			$_map = array();
+            return true;
 
-			// --------------------------------------------------------------------------
+        } else {
 
-			$this->load->model( 'cms/cms_page_model' );
-
-			$_pages		= $this->cms_page_model->get_all();
-			$_counter	= 0;
-
-			foreach ( $_pages as $page ) :
-
-				if ( $page->is_published && ! $page->is_homepage ) :
-
-					$_map[$_counter]				= new stdClass();
-					$_map[$_counter]->title			= htmlentities( $page->published->title );
-					$_map[$_counter]->breadcrumbs	= $page->published->breadcrumbs;
-					$_map[$_counter]->location		= site_url( $page->published->slug );
-					$_map[$_counter]->lastmod		= date( DATE_ATOM, strtotime( $page->modified ) );
-					$_map[$_counter]->changefreq	= 'monthly';
-					$_map[$_counter]->priority		= 0.5;
-
-				endif;
-
-				$_counter++;
-
-			endforeach;
-
-			// --------------------------------------------------------------------------
-
-			return $_map;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	protected function _generator_blog()
-	{
-		if ( isModuleEnabled( 'blog' ) ) :
-
-			$_map = array();
-
-			// --------------------------------------------------------------------------
-
-			$this->load->model( 'blog/blog_post_model' );
-
-			$_posts		= $this->blog_post_model->get_all();
-			$_url		= app_setting( 'url', 'blog' );
-			$_counter	= 0;
-
-			// --------------------------------------------------------------------------
-
-			//	Blog front page route
-			$_map[$_counter]				= new stdClass();
-			$_map[$_counter]->title			= htmlentities( 'Blog' );	//	TODO: this is silly, should blog "name" be configurable?
-			$_map[$_counter]->location		= site_url( $_url );
-			$_map[$_counter]->changefreq	= 'daily';
-			$_map[$_counter]->priority		= 0.5;
-
-			$_counter++;
-
-			// --------------------------------------------------------------------------
-
-			foreach ( $_posts as $post ) :
-
-				if ( $post->is_published ) :
-
-					$_map[$_counter]				= new stdClass();
-					$_map[$_counter]->title			= htmlentities( $post->title );
-					$_map[$_counter]->location		= site_url( $_url . $post->slug );
-					$_map[$_counter]->lastmod		= date( DATE_ATOM, strtotime( $post->modified ) );
-					$_map[$_counter]->changefreq	= 'monthly';
-					$_map[$_counter]->priority		= 0.5;
-
-				endif;
-
-				$_counter++;
-
-			endforeach;
-
-			// --------------------------------------------------------------------------
-
-			return $_map;
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-
-	protected function _generator_shop()
-	{
-		if ( isModuleEnabled( 'shop' ) ) :
-
-			//	TODO: all shop product/category/tag/sale routes etc
-
-		endif;
-	}
-
-
-	// --------------------------------------------------------------------------
-
-
-	public function get_routes()
-	{
-		$_routes						= array();
-		$_routes['sitemap']				= 'sitemap/sitemap';
-		$_routes[$this->_filename_xml]	= 'sitemap/sitemap';
-		$_routes[$this->_filename_json]	= 'sitemap/sitemap';
-
-		return $_routes;
-	}
+            @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
+            $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #1.');
+            return false;
+        }
+    }
 }
 
-
 // --------------------------------------------------------------------------
-
 
 /**
  * OVERLOADING NAILS' MODELS
@@ -349,14 +371,9 @@ class NAILS_Sitemap_model extends NAILS_Model
  *
  **/
 
-if ( ! defined( 'NAILS_ALLOW_EXTENSION_SITEMAP_MODEL' ) ) :
+if (!defined('NAILS_ALLOW_EXTENSION_SITEMAP_MODEL')) {
 
-	class Sitemap_model extends NAILS_Sitemap_model
-	{
-	}
-
-endif;
-
-
-/* End of file sitemap_model.php */
-/* Location: ./modules/sitemap/models/sitemap_model.php */
+    class Sitemap_model extends NAILS_Sitemap_model
+    {
+    }
+}
