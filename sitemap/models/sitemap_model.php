@@ -32,7 +32,10 @@ class NAILS_Sitemap_model extends NAILS_Model
         $this->filenameJson = 'sitemap.json';
         $this->filenameXml  = 'sitemap.xml';
 
-        //  Default writers
+        /**
+         * Default writers
+         * @todo: make these powered by the modules, ie. not in this file
+         */
         $this->writers['static'] = array($this, 'generatorStatic');
         $this->writers['cms']    = array($this, 'generatorCms');
         $this->writers['blog']   = array($this, 'generatorBlog');

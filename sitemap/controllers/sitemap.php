@@ -26,14 +26,6 @@ class NAILS_Sitemap extends NAILS_Controller
 
         // --------------------------------------------------------------------------
 
-        //  Enabled?
-        if (!isModuleEnabled('nailsapp/module-sitemap')) {
-
-            show_404();
-        }
-
-        // --------------------------------------------------------------------------
-
         $this->load->model('sitemap/sitemap_model');
 
         $this->filenameJson = $this->sitemap_model->getFilenameJson();
