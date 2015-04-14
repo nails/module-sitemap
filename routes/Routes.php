@@ -20,10 +20,10 @@ class Routes
      */
     public function getRoutes()
     {
-        $this->load->model('sitemap/sitemap_model');
+        get_instance()->load->model('sitemap/sitemap_model');
 
         $routes = array();
-        $routes = $routes + $this->sitemap_model->getRoutes();
+        $routes = $routes + get_instance()->sitemap_model->getRoutes();
 
         return $routes;
     }
