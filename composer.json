@@ -1,12 +1,6 @@
 {
     "name": "nailsapp/module-sitemap",
-    "keywords":
-    [
-        "Nails",
-        "Shed Collective",
-        "CodeIgniter",
-        "Sitemap Module"
-    ],
+    "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Sitemap Module"],
     "homepage": "http://nailsapp.co.uk/modules/sitemap",
     "description": "This is the \"Sitemap\" module for Nails.",
     "license": "MIT",
@@ -31,7 +25,6 @@
     },
     "require":
     {
-        "nailsapp/common" : "dev-develop"
     },
     "extra":
     {
