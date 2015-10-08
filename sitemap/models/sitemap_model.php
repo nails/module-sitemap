@@ -102,13 +102,13 @@ class NAILS_Sitemap_model extends NAILS_Model
         // --------------------------------------------------------------------------
 
         //  Sort the array into a vaguely sensible order
-        $this->load->helper('array');
+        \Nails\Factory::helper('array');
         array_sort_multi($map->pages, 'location');
 
         // --------------------------------------------------------------------------
 
         //  Save this data as JSON and XML files
-        $this->load->helper('file');
+        \Nails\Factory::helper('file');
 
         //  Write JSON sitemap
         if (!$this->writeJson($map)) {
