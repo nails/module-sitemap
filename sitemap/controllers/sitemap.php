@@ -204,7 +204,8 @@ class NAILS_Sitemap extends NAILS_Controller
             if (!$this->sitemap_model->generate()) {
 
                 //  Failed to generate sitemap
-                _LOG('Failed to generate sitemap: ' . $this->sitemap_model->last_error());
+                $oLogger = \Nails\Factory::service('Logger');
+                $oLogger->line('Failed to generate sitemap: ' . $this->sitemap_model->last_error());
 
                 //  Let the dev's know too, this could be serious
                 $subject = 'Failed to generate sitemap';
