@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Factory;
+
 class NAILS_Sitemap_model extends NAILS_Model
 {
     protected $writers;
@@ -102,13 +104,13 @@ class NAILS_Sitemap_model extends NAILS_Model
         // --------------------------------------------------------------------------
 
         //  Sort the array into a vaguely sensible order
-        \Nails\Factory::helper('array');
+        Factory::helper('array');
         array_sort_multi($map->pages, 'location');
 
         // --------------------------------------------------------------------------
 
         //  Save this data as JSON and XML files
-        \Nails\Factory::helper('file');
+        Factory::helper('file');
 
         //  Write JSON sitemap
         if (!$this->writeJson($map)) {

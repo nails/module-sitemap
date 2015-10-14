@@ -10,6 +10,8 @@
  * @link
  */
 
+use Nails\Factory;
+
 class NAILS_Sitemap extends NAILS_Controller
 {
     protected $filenameJson;
@@ -204,7 +206,7 @@ class NAILS_Sitemap extends NAILS_Controller
             if (!$this->sitemap_model->generate()) {
 
                 //  Failed to generate sitemap
-                $oLogger = \Nails\Factory::service('Logger');
+                $oLogger = Factory::service('Logger');
                 $oLogger->line('Failed to generate sitemap: ' . $this->sitemap_model->last_error());
 
                 //  Let the dev's know too, this could be serious

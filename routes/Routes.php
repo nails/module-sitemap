@@ -1,7 +1,5 @@
 <?php
 
-namespace Nails\Routes\Sitemap;
-
 /**
  * Generates sitemap routes
  *
@@ -11,6 +9,8 @@ namespace Nails\Routes\Sitemap;
  * @author      Nails Dev Team
  * @link
  */
+
+namespace Nails\Routes\Sitemap;
 
 class Routes
 {
