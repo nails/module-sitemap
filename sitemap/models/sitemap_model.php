@@ -7,7 +7,7 @@
  * @subpackage  module-sitemap
  * @category    Model
  * @author      Nails Dev Team
- * @link
+ * @todo bundle generators into their respective modules
  */
 
 use Nails\Factory;
@@ -161,30 +161,28 @@ class NAILS_Sitemap_model extends NAILS_Model
     {
         if (isModuleEnabled('nailsapp/module-cms')) {
 
-            $map = array();
+            $aMap       = array();
+            $oPageModel = Factory::model('Page', 'nailsapp/module-cms');
+            $aPages     = $oPageModel->get_all();
+            $iCounter   = 0;
 
-            $this->load->model('cms/cms_page_model');
+            foreach ($aPages as $oPage) {
 
-            $pages   = $this->cms_page_model->get_all();
-            $counter = 0;
+                if ($oPage->is_published && !$oPage->is_homepage) {
 
-            foreach ($pages as $page) {
-
-                if ($page->is_published && !$page->is_homepage) {
-
-                    $map[$counter]              = new stdClass();
-                    $map[$counter]->title       = htmlentities($page->published->title);
-                    $map[$counter]->breadcrumbs = $page->published->breadcrumbs;
-                    $map[$counter]->location    = site_url($page->published->slug);
-                    $map[$counter]->lastmod     = date(DATE_ATOM, strtotime($page->modified));
-                    $map[$counter]->changefreq  = 'monthly';
-                    $map[$counter]->priority    = 0.5;
+                    $aMap[$iCounter]              = new stdClass();
+                    $aMap[$iCounter]->title       = htmlentities($oPage->published->title);
+                    $aMap[$iCounter]->breadcrumbs = $oPage->published->breadcrumbs;
+                    $aMap[$iCounter]->location    = site_url($oPage->published->slug);
+                    $aMap[$iCounter]->lastmod     = date(DATE_ATOM, strtotime($oPage->modified));
+                    $aMap[$iCounter]->changefreq  = 'monthly';
+                    $aMap[$iCounter]->priority    = 0.5;
                 }
 
-                $counter++;
+                $iCounter++;
             }
 
-            return $map;
+            return $aMap;
         }
     }
 
