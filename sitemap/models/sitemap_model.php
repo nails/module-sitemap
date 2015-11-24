@@ -163,7 +163,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
             $aMap       = array();
             $oPageModel = Factory::model('Page', 'nailsapp/module-cms');
-            $aPages     = $oPageModel->get_all();
+            $aPages     = $oPageModel->getAll();
             $iCounter   = 0;
 
             foreach ($aPages as $oPage) {
@@ -201,7 +201,7 @@ class NAILS_Sitemap_model extends NAILS_Model
             $this->load->model('blog/blog_model');
             $this->load->model('blog/blog_post_model');
 
-            $blogs = $this->blog_model->get_all();
+            $blogs = $this->blog_model->getAll();
 
             foreach ($blogs as $blog) {
 
@@ -212,7 +212,7 @@ class NAILS_Sitemap_model extends NAILS_Model
                 $data['where'][] = array('column' => 'is_published', 'value' => true);
                 $data['where'][] = array('column' => 'published <=', 'value' => 'NOW()', 'escape' => false);
 
-                $posts   = $this->blog_post_model->get_all(null, null, $data);
+                $posts   = $this->blog_post_model->getAll(null, null, $data);
                 $counter = 0;
 
                 //  Blog front page route
