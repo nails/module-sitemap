@@ -207,7 +207,7 @@ class NAILS_Sitemap extends NAILS_Controller
 
                 //  Failed to generate sitemap
                 $oLogger = Factory::service('Logger');
-                $oLogger->line('Failed to generate sitemap: ' . $this->sitemap_model->last_error());
+                $oLogger->line('Failed to generate sitemap: ' . $this->sitemap_model->lastError());
 
                 //  Let the dev's know too, this could be serious
                 $subject = 'Failed to generate sitemap';

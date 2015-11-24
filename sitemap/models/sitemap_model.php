@@ -77,7 +77,7 @@ class NAILS_Sitemap_model extends NAILS_Model
         //  Will we be able to write to the cache?
         if (!is_writable(DEPLOY_CACHE_DIR)) {
 
-            $this->_set_error('Cache is not writeable.');
+            $this->setError('Cache is not writeable.');
             return false;
         }
 
@@ -283,7 +283,7 @@ class NAILS_Sitemap_model extends NAILS_Model
     {
         if (!@write_file(DEPLOY_CACHE_DIR . $this->filenameJson, json_encode($map))) {
 
-            $this->_set_error('Failed to write ' . $this->filenameJson . '.');
+            $this->setError('Failed to write ' . $this->filenameJson . '.');
             return false;
         }
     }
@@ -301,7 +301,7 @@ class NAILS_Sitemap_model extends NAILS_Model
 
         if (!$fh) {
 
-            $this->_set_error('Failed to write ' . $this->filenameXml . ': Could not open file for writing.');
+            $this->setError('Failed to write ' . $this->filenameXml . ': Could not open file for writing.');
             return false;
         }
 
@@ -322,7 +322,7 @@ class NAILS_Sitemap_model extends NAILS_Model
                 if (!fwrite($fh, $xml)) {
 
                     @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
-                    $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #2.');
+                    $this->setError('Failed to write ' . $this->filenameXml . ': Could write to file - #2.');
                     return false;
                 }
             }
@@ -333,7 +333,7 @@ class NAILS_Sitemap_model extends NAILS_Model
             if (!fwrite($fh, $xml)) {
 
                 @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
-                $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #3.');
+                $this->setError('Failed to write ' . $this->filenameXml . ': Could write to file - #3.');
                 return false;
             }
 
@@ -342,7 +342,7 @@ class NAILS_Sitemap_model extends NAILS_Model
         } else {
 
             @unlink(DEPLOY_CACHE_DIR . $this->filenameXml);
-            $this->_set_error('Failed to write ' . $this->filenameXml . ': Could write to file - #1.');
+            $this->setError('Failed to write ' . $this->filenameXml . ': Could write to file - #1.');
             return false;
         }
     }
