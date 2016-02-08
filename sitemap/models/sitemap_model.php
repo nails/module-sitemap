@@ -161,14 +161,15 @@ class NAILS_Sitemap_model extends NAILS_Model
     {
         if (isModuleEnabled('nailsapp/module-cms')) {
 
-            $aMap       = array();
-            $oPageModel = Factory::model('Page', 'nailsapp/module-cms');
-            $aPages     = $oPageModel->getAll();
-            $iCounter   = 0;
+            $aMap        = array();
+            $oPageModel  = Factory::model('Page', 'nailsapp/module-cms');
+            $aPages      = $oPageModel->getAll();
+            $iCounter    = 0;
+            $iHomepageId = $oPageModel->getHomepageId();
 
             foreach ($aPages as $oPage) {
 
-                if ($oPage->is_published && !$oPage->is_homepage) {
+                if ($oPage->is_published && $oPage->id != $iHomepageId) {
 
                     $aMap[$iCounter]              = new stdClass();
                     $aMap[$iCounter]->title       = htmlentities($oPage->published->title);
