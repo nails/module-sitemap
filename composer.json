@@ -31,7 +31,8 @@
         "nails" :
         {
             "moduleName": "sitemap",
-            "type": "module"
+            "type": "module",
+            "namespace": "Nails\\SiteMap\\"
         }
     }
 }
