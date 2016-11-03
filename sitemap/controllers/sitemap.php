@@ -11,8 +11,9 @@
  */
 
 use Nails\Factory;
+use App\Controller\Base;
 
-class NAILS_Sitemap extends NAILS_Controller
+class NAILS_Sitemap extends Base
 {
     protected $filenameJson;
     protected $filenameXml;
