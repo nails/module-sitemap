@@ -77,7 +77,7 @@ class NAILS_Sitemap_model extends NAILS_Model
         //  Will we be able to write to the cache?
         if (!is_writable(DEPLOY_CACHE_DIR)) {
 
-            $this->setError('Cache is not writeable.');
+            $this->setError('Cache is not writable.');
             return false;
         }
 
