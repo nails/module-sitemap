@@ -12,7 +12,9 @@
 
 namespace Nails\Routes\Sitemap;
 
-class Routes
+use Nails\Common\Model\BaseRoutes;
+
+class Routes extends BaseRoutes
 {
     /**
      * Returns an array of routes for this module
@@ -22,9 +24,9 @@ class Routes
     {
         get_instance()->load->model('sitemap/sitemap_model');
 
-        $routes = array();
-        $routes = $routes + get_instance()->sitemap_model->getRoutes();
+        $aRoutes = [];
+        $aRoutes = $aRoutes + get_instance()->sitemap_model->getRoutes();
 
-        return $routes;
+        return $aRoutes;
     }
 }
