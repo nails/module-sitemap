@@ -10,9 +10,10 @@
  * @link
  */
 
-namespace Nails\Routes\Sitemap;
+namespace Nails\Routes\SiteMap;
 
 use Nails\Common\Model\BaseRoutes;
+use Nails\Factory;
 
 class Routes extends BaseRoutes
 {
@@ -22,11 +23,11 @@ class Routes extends BaseRoutes
      */
     public function getRoutes()
     {
-        get_instance()->load->model('sitemap/sitemap_model');
-
-        $aRoutes = [];
-        $aRoutes = $aRoutes + get_instance()->sitemap_model->getRoutes();
-
-        return $aRoutes;
+        $oModel = Factory::model('SiteMap', 'nailsapp/module-sitemap');
+        return [
+            'sitemap'                  => 'sitemap/sitemap',
+            $oModel->getFilenameJson() => 'sitemap/sitemap',
+            $oModel->getFilenameXml()  => 'sitemap/sitemap',
+        ];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This class is the sitemap controller. It produces the various site maps supported by Nails.
+ * This class is the SiteMap controller. It produces the various site maps supported by Nails.
  *
  * @package     Nails
  * @subpackage  module-sitemap
@@ -13,10 +13,10 @@
 use Nails\Factory;
 use App\Controller\Base;
 
-class NAILS_Sitemap extends Base
+class Sitemap extends Base
 {
-    protected $filenameJson;
-    protected $filenameXml;
+    protected $sFilenameJson;
+    protected $sFilenameXml;
 
     // --------------------------------------------------------------------------
 
@@ -29,10 +29,10 @@ class NAILS_Sitemap extends Base
 
         // --------------------------------------------------------------------------
 
-        $this->load->model('sitemap/sitemap_model');
+        $oModel = Factory::model('SiteMap', 'nailsapp/module-sitemap');
 
-        $this->filenameJson = $this->sitemap_model->getFilenameJson();
-        $this->filenameXml  = $this->sitemap_model->getFilenameXml();
+        $this->sFilenameJson = $oModel->getFilenameJson();
+        $this->sFilenameXml  = $oModel->getFilenameXml();
     }
 
     // --------------------------------------------------------------------------
@@ -46,22 +46,18 @@ class NAILS_Sitemap extends Base
         switch (uri_string()) {
 
             case 'sitemap':
-
                 $this->outputHtml();
                 break;
 
-            case $this->filenameXml:
-
+            case $this->sFilenameXml:
                 $this->outputXml();
                 break;
 
-            case $this->filenameJson:
-
+            case $this->sFilenameJson:
                 $this->outputJson();
                 break;
 
             default:
-
                 show_404();
                 break;
         }
@@ -75,15 +71,14 @@ class NAILS_Sitemap extends Base
      */
     protected function outputHtml()
     {
-        //  Check cache for $this->filenameJson
-        if (!$this->checkCache($this->filenameJson)) {
-
+        //  Check cache for $this->sFilenameJson
+        if (!$this->checkCache($this->sFilenameJson)) {
             return;
         }
 
-        // --------------------------------------------------------------------------
+        $oView = Factory::service('View');
 
-        $this->data['sitemap'] = json_decode(file_get_contents(DEPLOY_CACHE_DIR . $this->filenameJson));
+        $this->data['sitemap'] = json_decode(file_get_contents(DEPLOY_CACHE_DIR . $this->sFilenameJson));
 
         if (empty($this->data['sitemap'])) {
 
@@ -93,16 +88,18 @@ class NAILS_Sitemap extends Base
              * unlisting us because of this.
              */
 
-            $this->output->set_header($this->input->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
-            $this->output->set_header('Status: 503 Service Temporarily Unavailable');
-            $this->output->set_header('Retry-After: 7200');
+            $oOutput = Factory::service('Output');
+            $oInput  = Factory::service('Input');
+            $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+            $oOutput->set_header('Status: 503 Service Temporarily Unavailable');
+            $oOutput->set_header('Retry-After: 7200');
 
             //  Inform devs
-            $subject = $this->filenameJson . ' contained no data';
-            $message = 'The cache file for the site map was found but did not contain any data.';
-            sendDeveloperMail($subject, $message);
+            $sSubject = $this->sFilenameJson . ' contained no data';
+            $sMessage = 'The cache file for the site map was found but did not contain any data.';
+            sendDeveloperMail($sSubject, $sMessage);
 
-            $this->load->view('sitemap/error');
+            $oView->load('sitemap/error');
             return false;
         }
 
@@ -113,9 +110,9 @@ class NAILS_Sitemap extends Base
 
         // --------------------------------------------------------------------------
 
-        $this->load->view('structure/header', $this->data);
-        $this->load->view('sitemap/html', $this->data);
-        $this->load->view('structure/footer', $this->data);
+        $oView->load('structure/header', $this->data);
+        $oView->load('sitemap/html', $this->data);
+        $oView->load('structure/footer', $this->data);
     }
 
     // --------------------------------------------------------------------------
@@ -126,31 +123,7 @@ class NAILS_Sitemap extends Base
      */
     protected function outputXml()
     {
-        //  Check cache for $this->filenameXml
-        if (!$this->checkCache($this->filenameXml)) {
-
-            return;
-        }
-
-        // --------------------------------------------------------------------------
-
-        //  Set XML headers
-        header('Cache-Control: no-store, no-cache, must-revalidate');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Content-type: text/xml');
-        header('Pragma: no-cache');
-
-        readfile(DEPLOY_CACHE_DIR . $this->filenameXml);
-
-        // --------------------------------------------------------------------------
-
-        /**
-         * Kill script, th, th, that's all folks.
-         * Stop the output class from hijacking our headers and setting an incorrect
-         * Content-Type
-         */
-
-        exit(0);
+        $this->output($this->sFilenameXml, 'text/xml');
     }
 
     // --------------------------------------------------------------------------
@@ -161,9 +134,21 @@ class NAILS_Sitemap extends Base
      */
     protected function outputJson()
     {
-        //  Check cache for $this->filenameJson
-        if (!$this->checkCache($this->filenameJson)) {
+        $this->output($this->sFilenameJson, 'application/json');
+    }
 
+    // --------------------------------------------------------------------------
+
+    /**
+     * Reads and outputs a file to the browser with no-cache headers
+     *
+     * @param string $sFilename The filename to read
+     * @param string $sMime     The content type to send
+     */
+    protected function output($sFilename, $sMime)
+    {
+        //  Check cache for $this->sFilenameJson
+        if (!$this->checkCache($sFilename)) {
             return;
         }
 
@@ -172,11 +157,11 @@ class NAILS_Sitemap extends Base
         //  Set JSON headers
         header('Cache-Control: no-store, no-cache, must-revalidate');
         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Content-type: application/json');
+        header('Content-type: ' . $sMime);
         header('Pragma: no-cache');
 
         //  Stream
-        readfile(DEPLOY_CACHE_DIR . $this->filenameJson);
+        readfile(DEPLOY_CACHE_DIR . $sFilename);
 
         // --------------------------------------------------------------------------
 
@@ -193,7 +178,9 @@ class NAILS_Sitemap extends Base
 
     /**
      * Checks for a cached file, if not found attempts to generate it
+     *
      * @param  string $file The cache file to check
+     *
      * @return boolean
      */
     protected function checkCache($file)
@@ -202,63 +189,33 @@ class NAILS_Sitemap extends Base
         if (!is_file(DEPLOY_CACHE_DIR . $file)) {
 
             //  If not found, generate
-            $this->load->model('sitemap/sitemap_model');
+            $oModel = Factory::model('SiteMap', 'nailsapp/module-sitemap');
 
-            if (!$this->sitemap_model->generate()) {
+            if (!$oModel->generate()) {
 
                 //  Failed to generate sitemap
                 $oLogger = Factory::service('Logger');
-                $oLogger->line('Failed to generate sitemap: ' . $this->sitemap_model->lastError());
+                $oLogger->line('Failed to generate sitemap: ' . $oModel->lastError());
 
                 //  Let the dev's know too, this could be serious
-                $subject = 'Failed to generate sitemap';
-                $message = 'There was no ' . $file . ' data in the cache and I failed to recreate it.';
-                sendDeveloperMail($subject, $message);
+                $sSubject = 'Failed to generate sitemap';
+                $sMessage = 'There was no ' . $file . ' data in the cache and I failed to recreate it.';
+                sendDeveloperMail($sSubject, $sMessage);
 
                 //  Send a temporarily unavailable header, we don't want search engines unlisting us because of this.
-                $protocol = $this->input->server('SERVER_PROTOCOL');
-                $this->output->set_header($protocol . ' 503 Service Temporarily Unavailable');
-                $this->output->set_header('Status: 503 Service Temporarily Unavailable');
-                $this->output->set_header('Retry-After: 7200');
+                $oOutput = Factory::service('Output');
+                $oInput  = Factory::service('Input');
 
-                $this->load->view('sitemap/error');
+                $oOutput->set_header($oInput->server('SERVER_PROTOCOL') . ' 503 Service Temporarily Unavailable');
+                $oOutput->set_header('Status: 503 Service Temporarily Unavailable');
+                $oOutput->set_header('Retry-After: 7200');
+
+                $oView = Factory::service('View');
+                $oView->load('sitemap/error');
                 return false;
             }
         }
 
         return true;
-    }
-}
-
-// --------------------------------------------------------------------------
-
-/**
- * OVERLOADING NAILS' EMAIL MODULES
- *
- * The following block of code makes it simple to extend one of the core Nails
- * controllers. Some might argue it's a little hacky but it's a simple 'fix'
- * which negates the need to massively extend the CodeIgniter Loader class
- * even further (in all honesty I just can't face understanding the whole
- * Loader class well enough to change it 'properly').
- *
- * Here's how it works:
- *
- * CodeIgniter instantiate a class with the same name as the file, therefore
- * when we try to extend the parent class we get 'cannot redeclare class X' errors
- * and if we call our overloading class something else it will never get instantiated.
- *
- * We solve this by prefixing the main class with NAILS_ and then conditionally
- * declaring this helper class below; the helper gets instantiated et voila.
- *
- * If/when we want to extend the main class we simply define NAILS_ALLOW_EXTENSION_CLASSNAME
- * before including this PHP file and extend as normal (i.e in the same way as below);
- * the helper won't be declared so we can declare our own one, app specific.
- *
- **/
-
-if (!defined('NAILS_ALLOW_EXTENSION_SITEMAP')) {
-
-    class Sitemap extends NAILS_Sitemap
-    {
     }
 }

@@ -1,36 +1,31 @@
 <ul>
-	<?php
+    <?php
 
-		for ( $i = 0; $i < count( $sitemap->pages ); $i++ ) :
+    foreach ($sitemap->pages as $oPage) {
 
-			if ( ! empty( $sitemap->pages[$i]->breadcrumbs ) && count( $sitemap->pages[$i]->breadcrumbs ) - 1 > 0 ) :
+        if (!empty($oPage->breadcrumbs) && count($oPage->breadcrumbs) > 1) {
 
-				echo '<li>';
+            echo '<li>';
 
-					//	Breadcrumbs, fancy it up a little
-					$_bc = $sitemap->pages[$i]->breadcrumbs;
-					array_pop( $_bc );
+            //	Breadcrumbs, fancy it up a little
+            $aCrumbs = $oPage->breadcrumbs;
+            array_pop($aCrumbs);
 
-					foreach ( $_bc as $crumb ) :
+            foreach ($aCrumbs as $oCrumb) {
+                echo '<span class="crumb">' . $oCrumb->title . '</span> ';
+            }
 
-						echo '<span class="crumb">' . $crumb->title . '</span> ';
+            echo anchor($oPage->location, $oPage->title);
+            echo '</li>';
 
-					endforeach;
+        } else {
 
-					echo anchor( $sitemap->pages[$i]->location, $sitemap->pages[$i]->title );
+            //	No breadcrumbs, just use basic details
+            echo '<li class="top-level">';
+            echo anchor($oPage->location, $oPage->title);
+            echo '</li>';
+        }
+    }
 
-				echo '</li>';
-
-			else :
-
-				//	No breadcrumbs, just use basic details
-				echo '<li class="top-level">';
-					echo anchor( $sitemap->pages[$i]->location, $sitemap->pages[$i]->title );
-				echo '</li>';
-
-			endif;
-
-		endfor;
-
-	?>
+    ?>
 </ul>
