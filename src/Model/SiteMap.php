@@ -107,6 +107,7 @@ class SiteMap extends Base
         //  Sort the array into a vaguely sensible order
         Factory::helper('array');
         array_sort_multi($oMap->pages, 'location');
+        $oMap->pages = array_values($oMap->pages);
 
         // --------------------------------------------------------------------------
 
