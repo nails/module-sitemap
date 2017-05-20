@@ -10,18 +10,18 @@
  * @link
  */
 
-namespace Nails\Routes\SiteMap;
+namespace Nails\SiteMap;
 
-use Nails\Common\Model\BaseRoutes;
+use Nails\Common\Interfaces\RouteGenerator;
 use Nails\Factory;
 
-class Routes extends BaseRoutes
+class Routes implements RouteGenerator
 {
     /**
      * Returns an array of routes for this module
      * @return array
      */
-    public function getRoutes()
+    public static function generate()
     {
         $oModel = Factory::model('SiteMap', 'nailsapp/module-sitemap');
         return [
