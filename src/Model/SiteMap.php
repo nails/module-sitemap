@@ -78,7 +78,7 @@ class SiteMap extends Base
     public function generate()
     {
         //  Will we be able to write to the cache?
-        if (!is_writable(DEPLOY_CACHE_DIR)) {
+        if (!is_writable(CACHE_PATH)) {
             $this->setError('Cache is not writable.');
             return false;
         }
@@ -264,7 +264,7 @@ class SiteMap extends Base
      */
     protected function writeJson($oMap)
     {
-        if (!@write_file(DEPLOY_CACHE_DIR . $this->sFilenameJson, json_encode($oMap))) {
+        if (!@write_file(CACHE_PATH . $this->sFilenameJson, json_encode($oMap))) {
             $this->setError('Failed to write ' . $this->sFilenameJson . '.');
             return false;
         }
@@ -282,7 +282,7 @@ class SiteMap extends Base
      */
     protected function writeXml($oMap)
     {
-        $oFh = fopen(DEPLOY_CACHE_DIR . $this->sFilenameXml, 'w');
+        $oFh = fopen(CACHE_PATH . $this->sFilenameXml, 'w');
 
         if (!$oFh) {
             $this->setError('Failed to write ' . $this->sFilenameXml . ': Could not open file for writing.');
@@ -320,7 +320,7 @@ class SiteMap extends Base
                 $aXml[] .= '</url>';
 
                 if (!fwrite($oFh, implode("\n", $aXml))) {
-                    @unlink(DEPLOY_CACHE_DIR . $this->sFilenameXml);
+                    @unlink(CACHE_PATH . $this->sFilenameXml);
                     $this->setError('Failed to write ' . $this->sFilenameXml . ': Could write to file - #2.');
                     return false;
                 }
@@ -330,7 +330,7 @@ class SiteMap extends Base
             $sXml = '</urlset>' . "\n";
 
             if (!fwrite($oFh, $sXml)) {
-                @unlink(DEPLOY_CACHE_DIR . $this->sFilenameXml);
+                @unlink(CACHE_PATH . $this->sFilenameXml);
                 $this->setError('Failed to write ' . $this->sFilenameXml . ': Could write to file - #3.');
                 return false;
             }
@@ -338,7 +338,7 @@ class SiteMap extends Base
             return true;
 
         } else {
-            @unlink(DEPLOY_CACHE_DIR . $this->sFilenameXml);
+            @unlink(CACHE_PATH . $this->sFilenameXml);
             $this->setError('Failed to write ' . $this->sFilenameXml . ': Could write to file - #1.');
             return false;
         }

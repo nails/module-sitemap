@@ -78,7 +78,7 @@ class Sitemap extends Base
 
         $oView = Factory::service('View');
 
-        $this->data['sitemap'] = json_decode(file_get_contents(DEPLOY_CACHE_DIR . $this->sFilenameJson));
+        $this->data['sitemap'] = json_decode(file_get_contents(CACHE_PATH . $this->sFilenameJson));
 
         if (empty($this->data['sitemap'])) {
 
@@ -161,7 +161,7 @@ class Sitemap extends Base
         header('Pragma: no-cache');
 
         //  Stream
-        readfile(DEPLOY_CACHE_DIR . $sFilename);
+        readfile(CACHE_PATH . $sFilename);
 
         // --------------------------------------------------------------------------
 
@@ -186,7 +186,7 @@ class Sitemap extends Base
     protected function checkCache($file)
     {
         //  Check cache for $file
-        if (!is_file(DEPLOY_CACHE_DIR . $file)) {
+        if (!is_file(CACHE_PATH . $file)) {
 
             //  If not found, generate
             $oModel = Factory::model('SiteMap', 'nailsapp/module-sitemap');
