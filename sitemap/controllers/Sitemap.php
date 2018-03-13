@@ -157,7 +157,7 @@ class Sitemap extends Base
         //  Set JSON headers
         header('Cache-Control: no-store, no-cache, must-revalidate');
         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Content-type: ' . $sMime);
+        header('Content-Type: ' . $sMime);
         header('Pragma: no-cache');
 
         //  Stream
