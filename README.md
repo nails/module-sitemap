@@ -1,4 +1,4 @@
-#Sitemap Module for Nails
+# Sitemap Module for Nails
 
 This is the sitemap module for nails, it brings automatic sitemap generation capabilities to the app.
 
