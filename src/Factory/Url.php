@@ -104,7 +104,7 @@ class Url
      */
     public function setAlternate($sUrl, $sLang)
     {
-        $this->aAlternates[] = Factory::factory('Url', 'nailsapp/module-sitemap')
+        $this->aAlternates[] = Factory::factory('Url', 'nails/module-sitemap')
                                       ->setUrl($sUrl)
                                       ->setLang($sLang);
         return $this;

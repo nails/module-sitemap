@@ -42,7 +42,7 @@ class Generate extends Base
         $oOutput->writeln('Beginning...');
 
         //  Writing
-        $oSiteMapService = Factory::service('SiteMap', 'nailsapp/module-sitemap');
+        $oSiteMapService = Factory::service('SiteMap', 'nails/module-sitemap');
         $oSiteMapService->write();
 
         //  Cleaning up

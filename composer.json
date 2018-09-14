@@ -1,5 +1,5 @@
 {
-    "name": "nailsapp/module-sitemap",
+    "name": "nails/module-sitemap",
     "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Sitemap Module"],
     "homepage": "http://nailsapp.co.uk/modules/sitemap",
     "description": "This is the \"Sitemap\" module for Nails.",
@@ -27,7 +27,7 @@
     "prefer-stable": true,
     "require":
     {
-        "nailsapp/common": "dev-develop"
+        "nails/common": "dev-develop"
     },
     "require-dev":
     {

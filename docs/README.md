@@ -1,4 +1,4 @@
-# Docs for `nailsapp/module-sitemap`
+# Docs for `nails/module-sitemap`
 
 
 This module brings file sitemap capabilities to Nails.
@@ -10,7 +10,7 @@ This module brings file sitemap capabilities to Nails.
 This module provides the `SiteMap` service; to generate the site map, call the service's `write()` method.
 
 ```php
-$oSiteMap = Factory::service('SiteMap', 'nailsapp/module-sitemap');
+$oSiteMap = Factory::service('SiteMap', 'nails/module-sitemap');
 $oSiteMap->write();
 ```
 
@@ -31,7 +31,7 @@ The interface enforces a public method, `execute()`, which takes no arguments an
 A new instance of `Nails\SiteMap\Factory\Url()` can be fetched via the Nails Factory:
 
 ```php
-$oUrl = Factory::factory('Url', 'nailsapp/module-sitemap');
+$oUrl = Factory::factory('Url', 'nails/module-sitemap');
 ```
 
 The following properties can be set:
@@ -56,7 +56,7 @@ class Generator
     public function execute()
     {
 		return [
-			Factory::factory('Url', 'nailsapp/module-sitemap')
+			Factory::factory('Url', 'nails/module-sitemap')
 				->setUrl(siteUrl('some-page'))
 				->setChangeFrequency('daily')
 				->setPriority(0.75)
