@@ -19,7 +19,7 @@ class SiteMap
     /**
      * Where to store the sitemap
      */
-    const SITEMAP_DIR = FCPATH;
+    const SITEMAP_DIR = NAILS_APP_PATH;
 
     /**
      * The name to give the sitemap file
