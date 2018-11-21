@@ -12,6 +12,7 @@
 namespace Nails\SiteMap\Service;
 
 use DOMDocument;
+use Nails\Components;
 use Nails\SiteMap\Exception\WriteException;
 
 class SiteMap
@@ -55,7 +56,7 @@ class SiteMap
         $aGenerators = [];
         $aComponents = array_merge(
             [(object) ['namespace' => 'App\\']],
-            _NAILS_GET_MODULES()
+            Components::modules()
         );
 
         foreach ($aComponents as $oComponent) {
