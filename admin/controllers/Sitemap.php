@@ -68,6 +68,8 @@ class Sitemap extends Base
             if (file_exists($sFile)) {
                 $oXmlObject          = new SimpleXMLElement(file_get_contents($sFile));
                 $this->data['aUrls'] = getFromArray('url', (array) $oXmlObject);
+            } else {
+                throw new \RuntimeException('Site map does not exist');
             }
 
         } catch (\Exception $e) {
