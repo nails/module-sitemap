@@ -43,7 +43,7 @@ class Sitemap extends Base
      *
      * @return array
      */
-    public static function permissions()
+    public static function permissions(): array
     {
         return parent::permissions() + [
                 'view'     => 'View the sitemap',
