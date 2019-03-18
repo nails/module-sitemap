@@ -2,6 +2,7 @@
 
 namespace Nails\SiteMap\Factory;
 
+use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 
 class Url
@@ -76,7 +77,7 @@ class Url
      * @param array  $aArguments Any passed arguments
      *
      * @return $this
-     * @throws \Exception
+     * @throws NailsException
      */
     public function __call($sMethod, $aArguments)
     {
@@ -88,7 +89,7 @@ class Url
                 return $this->{$this->aMethods[$sMethod]};
             }
         } else {
-            throw new \Exception('Call to undefined method ' . get_called_class() . '::' . $sMethod . '()');
+            throw new NailsException('Call to undefined method ' . get_called_class() . '::' . $sMethod . '()');
         }
     }
 
