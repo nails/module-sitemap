@@ -9,13 +9,23 @@
     </thead>
     <tbody>
         <?php
-        foreach ($aUrls as $oUrl) {
+        if (!empty($aUrls)) {
+            foreach ($aUrls as $oUrl) {
+                ?>
+                <tr>
+                    <td><?=anchor($oUrl->loc, null, 'target="_blank"')?></td>
+                    <td><?=$oUrl->lastmod?></td>
+                    <td><?=$oUrl->changefreq?></td>
+                    <td><?=$oUrl->priority?></td>
+                </tr>
+                <?php
+            }
+        } else {
             ?>
             <tr>
-                <td><?=anchor($oUrl->loc, null, 'target="_blank"')?></td>
-                <td><?=$oUrl->lastmod?></td>
-                <td><?=$oUrl->changefreq?></td>
-                <td><?=$oUrl->priority?></td>
+                <td colspan="4" class="no-data">
+                    No URLs in Sitemap
+                </td>
             </tr>
             <?php
         }
