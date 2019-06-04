@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Generate extends Base
 {
     /**
-     * Configures the app
+     * Configures the command
      * @return void
      */
     protected function configure()
