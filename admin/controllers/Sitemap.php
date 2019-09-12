@@ -15,6 +15,7 @@ namespace Nails\Admin\Sitemap;
 use SimpleXMLElement;
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Helper;
+use Nails\Auth;
 use Nails\Factory;
 
 class Sitemap extends Base
@@ -98,7 +99,7 @@ class Sitemap extends Base
         $oService = Factory::service('SiteMap', 'nails/module-sitemap');
         $oService->write();
 
-        $oSession = Factory::service('Session', 'nails/module-auth');
+        $oSession = Factory::service('Session', Auth\Constants::MODULE_SLUG);
         $oSession->setFlashData('success', 'Sitemap generated successfully.');
 
         redirect('admin/sitemap/sitemap');
