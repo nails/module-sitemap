@@ -1,9 +1,10 @@
 <?php
 
-namespace Nails\SiteMAp\Console\Command;
+namespace Nails\SiteMap\Console\Command;
 
 use Nails\Console\Command\Base;
 use Nails\Factory;
+use Nails\SiteMap\Constants;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -11,6 +12,7 @@ class Generate extends Base
 {
     /**
      * Configures the command
+     *
      * @return void
      */
     protected function configure()
@@ -25,11 +27,11 @@ class Generate extends Base
     /**
      * Executes the app
      *
-     * @param  InputInterface  $oInput  The Input Interface provided by Symfony
-     * @param  OutputInterface $oOutput The Output Interface provided by Symfony
+     * @param InputInterface  $oInput  The Input Interface provided by Symfony
+     * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
-     * @throws \Exception
      * @return void
+     * @throws \Exception
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)
     {
@@ -42,7 +44,7 @@ class Generate extends Base
         $oOutput->writeln('Beginning...');
 
         //  Writing
-        $oSiteMapService = Factory::service('SiteMap', 'nails/module-sitemap');
+        $oSiteMapService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $oSiteMapService->write();
 
         //  Cleaning up
@@ -52,5 +54,7 @@ class Generate extends Base
         //  And we're done!
         $oOutput->writeln('');
         $oOutput->writeln('Complete!');
+
+        return static::EXIT_CODE_SUCCESS;
     }
 }

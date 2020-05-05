@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'services' => [
+    'services'  => [
         'SiteMap' => function () {
             if (class_exists('\App\SiteMap\Service\SiteMap')) {
                 return new \App\SiteMap\Service\SiteMap();
@@ -18,5 +18,5 @@ return [
                 return new \Nails\SiteMap\Factory\Url();
             }
         },
-    ]
+    ],
 ];

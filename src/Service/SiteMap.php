@@ -14,16 +14,21 @@ namespace Nails\SiteMap\Service;
 use DOMDocument;
 use Nails\Components;
 use Nails\SiteMap\Exception\WriteException;
+use Nails\SiteMap\Interfaces\Generator;
 
 class SiteMap
 {
     /**
      * Where to store the sitemap
+     *
+     * @var string
      */
     const SITEMAP_DIR = NAILS_APP_PATH;
 
     /**
      * The name to give the sitemap file
+     *
+     * @var string
      */
     const SITEMAP_FILE = 'sitemap.xml';
 
@@ -31,14 +36,15 @@ class SiteMap
 
     /**
      * The various sitemap generators
-     * @var array
+     *
+     * @var Generator[]
      */
     protected static $aGenerators = [];
 
     // --------------------------------------------------------------------------
 
     /**
-     * Construct SiteMap
+     * SiteMap constructor.
      */
     public function __construct()
     {
@@ -49,19 +55,19 @@ class SiteMap
 
     /**
      * Returns the available generators
-     * @return array
+     *
+     * @return Generator[]
      */
-    public static function getGenerators()
+    public static function getGenerators(): array
     {
         $aGenerators = [];
-        $aComponents = array_merge(
-            [(object) ['namespace' => 'App\\']],
-            Components::modules()
-        );
+        foreach (Components::available() as $oComponent) {
 
-        foreach ($aComponents as $oComponent) {
-            $sClass = '\\' . $oComponent->namespace . 'SiteMap\Generator';
-            if (class_exists($sClass) && classImplements($sClass, 'Nails\SiteMap\Interfaces\Generator')) {
+            $aClasses = $oComponent
+                ->findClasses('SiteMap\Generator')
+                ->whichImplement(Generator::class);
+
+            foreach ($aClasses as $sClass) {
                 $aGenerators[] = $sClass;
             }
         }
@@ -73,9 +79,10 @@ class SiteMap
 
     /**
      * Writes the sitemap file
+     *
      * @throws WriteException
      */
-    public function write()
+    public function write(): void
     {
         //  Begin XML
         $oXmlObject = new DOMDocument('1.0', 'UTF-8');

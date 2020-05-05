@@ -12,6 +12,7 @@
 
 namespace Nails\Admin\Sitemap;
 
+use Nails\SiteMap\Constants;
 use SimpleXMLElement;
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Helper;
@@ -61,7 +62,7 @@ class Sitemap extends Base
      */
     public function index()
     {
-        $oService = Factory::service('SiteMap', 'nails/module-sitemap');
+        $oService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $sFile    = $oService::SITEMAP_DIR . $oService::SITEMAP_FILE;
 
         $this->data['aUrls'] = [];
@@ -96,7 +97,7 @@ class Sitemap extends Base
             show404();
         }
 
-        $oService = Factory::service('SiteMap', 'nails/module-sitemap');
+        $oService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $oService->write();
 
         /** @var Session $oSession */

@@ -4,48 +4,56 @@ namespace Nails\SiteMap\Factory;
 
 use Nails\Common\Exception\NailsException;
 use Nails\Factory;
+use Nails\SiteMap\Constants;
 
 class Url
 {
     /**
      * Stores an array of the getter/setters for the other properties
+     *
      * @var array
      */
     protected $aMethods = [];
 
     /**
      * The URL
+     *
      * @var string
      */
     protected $sUrl;
 
     /**
      * The last modified date of the URL
+     *
      * @var string
      */
     protected $sModified;
 
     /**
      * How often the URL is updated
+     *
      * @var string
      */
     protected $sChangeFrequency = 'weekly';
 
     /**
      * The priority of the URL
+     *
      * @var float
      */
     protected $fPriority = 0.5;
 
     /**
      * The language the link is in
+     *
      * @var string
      */
     protected $sLang;
 
     /**
      * Alternative URL's
-     * @var array
+     *
+     * @var Url[]
      */
     protected $aAlternates = [];
 
@@ -98,16 +106,16 @@ class Url
     /**
      * Adds an alternate version of the link
      *
-     * @param $sUrl
-     * @param $sLang
+     * @param $sUrl  The alternate URL
+     * @param $sLang The language of the alternate URL
      *
      * @return $this
      */
-    public function setAlternate($sUrl, $sLang)
+    public function setAlternate($sUrl, $sLang): self
     {
-        $this->aAlternates[] = Factory::factory('Url', 'nails/module-sitemap')
-                                      ->setUrl($sUrl)
-                                      ->setLang($sLang);
+        $this->aAlternates[] = Factory::factory('Url', Constants::MODULE_SLUG)
+            ->setUrl($sUrl)
+            ->setLang($sLang);
         return $this;
     }
 
@@ -115,9 +123,10 @@ class Url
 
     /**
      * Returns any alternative URLs
-     * @return array
+     *
+     * @return Url[]
      */
-    public function getAlternates()
+    public function getAlternates(): array
     {
         return $this->aAlternates;
     }
