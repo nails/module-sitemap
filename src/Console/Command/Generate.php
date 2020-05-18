@@ -5,6 +5,7 @@ namespace Nails\SiteMap\Console\Command;
 use Nails\Console\Command\Base;
 use Nails\Factory;
 use Nails\SiteMap\Constants;
+use Nails\SiteMap\Service\SiteMap;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -44,6 +45,7 @@ class Generate extends Base
         $oOutput->writeln('Beginning...');
 
         //  Writing
+        /** @var SiteMap $oSiteMapService */
         $oSiteMapService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $oSiteMapService->write();
 
