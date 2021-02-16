@@ -28,7 +28,7 @@ class Sitemap extends Base
      */
     public static function announce()
     {
-        $oNav = Factory::factory('Nav', 'nails/module-admin')
+        $oNav = Factory::factory('Nav', \Nails\Admin\Constants::MODULE_SLUG)
             ->setLabel('Sitemap');
 
         if (userHasPermission('admin:sitemap:sitemap:view')) {
