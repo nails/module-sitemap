@@ -51,7 +51,7 @@ class Generate extends Base
 
         //  Cleaning up
         $oOutput->writeln('');
-        $oOutput->writeln('<comment>Cleaning up...</comment>');
+        $oOutput->writeln('<comment>Cleaning up</comment>...');
 
         //  And we're done!
         $oOutput->writeln('');
