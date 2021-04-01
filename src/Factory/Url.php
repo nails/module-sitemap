@@ -6,15 +6,13 @@ use Nails\Common\Exception\NailsException;
 use Nails\Factory;
 use Nails\SiteMap\Constants;
 
+/**
+ * Class Url
+ *
+ * @package Nails\SiteMap\Factory
+ */
 class Url
 {
-    /**
-     * Stores an array of the getter/setters for the other properties
-     *
-     * @var array
-     */
-    protected $aMethods = [];
-
     /**
      * The URL
      *
@@ -60,45 +58,136 @@ class Url
     // --------------------------------------------------------------------------
 
     /**
-     * Url constructor.
+     * Sets the URL
+     *
+     * @param string $sUrl The URL to set
+     *
+     * @return $this
      */
-    public function __construct()
+    public function setUrl(string $sUrl): self
     {
-        $aVars = get_object_vars($this);
-        unset($aVars['aMethods']);
-        unset($aVars['aAlternates']);
-        $aVars = array_keys($aVars);
-
-        foreach ($aVars as $sVar) {
-            $sNormalised                          = substr($sVar, 1);
-            $this->aMethods['set' . $sNormalised] = $sVar;
-            $this->aMethods['get' . $sNormalised] = $sVar;
-        }
+        $this->sUrl = $sUrl;
+        return $this;
     }
 
     // --------------------------------------------------------------------------
 
     /**
-     * Mimics setters and getters for class properties
+     * Gets the URL
      *
-     * @param string $sMethod    The method being called
-     * @param array  $aArguments Any passed arguments
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->sUrl;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the modified date
+     *
+     * @param string $sModified The modified date
      *
      * @return $this
-     * @throws NailsException
      */
-    public function __call($sMethod, $aArguments)
+    public function setModified(string $sModified): self
     {
-        if (array_key_exists($sMethod, $this->aMethods)) {
-            if (substr($sMethod, 0, 3) === 'set') {
-                $this->{$this->aMethods[$sMethod]} = reset($aArguments);
-                return $this;
-            } else {
-                return $this->{$this->aMethods[$sMethod]};
-            }
-        } else {
-            throw new NailsException('Call to undefined method ' . get_called_class() . '::' . $sMethod . '()');
-        }
+        $this->sModified = $sModified;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the modified date
+     *
+     * @return string|null
+     */
+    public function getModified(): ?string
+    {
+        return $this->sModified;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the change frequency
+     *
+     * @param string $sChangeFrequency the change frequency
+     *
+     * @return $this
+     */
+    public function setChangeFrequency(string $sChangeFrequency): self
+    {
+        $this->sChangeFrequency = $sChangeFrequency;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the change frequency
+     *
+     * @return string|null
+     */
+    public function getChangeFrequency(): ?string
+    {
+        return $this->sChangeFrequency;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the priority
+     *
+     * @param float $fPriority The priority
+     *
+     * @return $this
+     */
+    public function setPriority(float $fPriority): self
+    {
+        $this->fPriority = $fPriority;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the priority
+     *
+     * @return float|null
+     */
+    public function getPriority(): ?float
+    {
+        return $this->fPriority;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Sets the language
+     *
+     * @param string $sLang The language
+     *
+     * @return $this
+     */
+    public function setLang(string $sLang): self
+    {
+        $this->sLang = $sLang;
+        return $this;
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Gets the language
+     *
+     * @return string|null
+     */
+    public function getLang(): ?string
+    {
+        return $this->sLang;
     }
 
     // --------------------------------------------------------------------------
@@ -111,11 +200,12 @@ class Url
      *
      * @return $this
      */
-    public function setAlternate($sUrl, $sLang): self
+    public function setAlternate(string $sUrl, string $sLang): self
     {
         $this->aAlternates[] = Factory::factory('Url', Constants::MODULE_SLUG)
             ->setUrl($sUrl)
             ->setLang($sLang);
+
         return $this;
     }
 
