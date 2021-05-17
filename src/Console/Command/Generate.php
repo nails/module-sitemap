@@ -31,7 +31,7 @@ class Generate extends Base
      * @param InputInterface  $oInput  The Input Interface provided by Symfony
      * @param OutputInterface $oOutput The Output Interface provided by Symfony
      *
-     * @return void
+     * @return int
      * @throws \Exception
      */
     protected function execute(InputInterface $oInput, OutputInterface $oOutput)

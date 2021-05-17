@@ -195,16 +195,20 @@ class Url
     /**
      * Adds an alternate version of the link
      *
-     * @param $sUrl  The alternate URL
-     * @param $sLang The language of the alternate URL
+     * @param string $sUrl  The alternate URL
+     * @param string $sLang The language of the alternate URL
      *
      * @return $this
      */
     public function setAlternate(string $sUrl, string $sLang): self
     {
-        $this->aAlternates[] = Factory::factory('Url', Constants::MODULE_SLUG)
+        /** @var Url $oUrl */
+        $oUrl = Factory::factory('Url', Constants::MODULE_SLUG);
+        $oUrl
             ->setUrl($sUrl)
             ->setLang($sLang);
+
+        $this->aAlternates[] = $oUrl;
 
         return $this;
     }

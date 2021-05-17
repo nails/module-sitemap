@@ -108,7 +108,7 @@ class SiteMap
                 $oUrl->appendChild($oXmlObject->createElement('loc', $sUrl));
                 $oUrl->appendChild($oXmlObject->createElement('lastmod', $oItem->getModified()));
                 $oUrl->appendChild($oXmlObject->createElement('changefreq', $oItem->getChangeFrequency()));
-                $oUrl->appendChild($oXmlObject->createElement('priority', $oItem->getPriority()));
+                $oUrl->appendChild($oXmlObject->createElement('priority', (string) $oItem->getPriority()));
 
                 $aAlternates = $oItem->getAlternates();
                 foreach ($aAlternates as $oAlternate) {
