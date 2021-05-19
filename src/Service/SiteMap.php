@@ -144,7 +144,9 @@ class SiteMap
     {
         $oUrl = $oXmlObject->createElement('url');
         $oUrl->appendChild($oXmlObject->createElement('loc', $oItem->getUrl()));
-        $oUrl->appendChild($oXmlObject->createElement('lastmod', $oItem->getModified()));
+        if ($oItem->getModified()) {
+            $oUrl->appendChild($oXmlObject->createElement('lastmod', $oItem->getModified()));
+        }
         $oUrl->appendChild($oXmlObject->createElement('changefreq', $oItem->getChangeFrequency()));
         $oUrl->appendChild($oXmlObject->createElement('priority', (string) $oItem->getPriority()));
 
