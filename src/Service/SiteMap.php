@@ -13,9 +13,17 @@ namespace Nails\SiteMap\Service;
 
 use DOMDocument;
 use Nails\Components;
+use Nails\Factory;
+use Nails\SiteMap\Constants;
 use Nails\SiteMap\Exception\WriteException;
+use Nails\SiteMap\Factory\Url;
 use Nails\SiteMap\Interfaces\Generator;
 
+/**
+ * Class SiteMap
+ *
+ * @package Nails\SiteMap\Service
+ */
 class SiteMap
 {
     /**
@@ -92,6 +100,14 @@ class SiteMap
         $oUrlSet->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $oUrlSet->setAttribute('xsi:schemaLocation', 'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd');
 
+        //  Homepage
+        /** @var Url $oHomepage */
+        $oHomepage = Factory::factory('Url', Constants::MODULE_SLUG);
+        $oHomepage->setUrl(siteUrl());
+
+        $this->addItem($oXmlObject, $oUrlSet, $oHomepage);
+
+        //  Generators
         foreach (static::$aGenerators as $sGeneratorClass) {
 
             $oGenerator = new $sGeneratorClass();
@@ -104,22 +120,7 @@ class SiteMap
                     continue;
                 }
 
-                $oUrl = $oXmlObject->createElement('url');
-                $oUrl->appendChild($oXmlObject->createElement('loc', $sUrl));
-                $oUrl->appendChild($oXmlObject->createElement('lastmod', $oItem->getModified()));
-                $oUrl->appendChild($oXmlObject->createElement('changefreq', $oItem->getChangeFrequency()));
-                $oUrl->appendChild($oXmlObject->createElement('priority', (string) $oItem->getPriority()));
-
-                $aAlternates = $oItem->getAlternates();
-                foreach ($aAlternates as $oAlternate) {
-                    $oNode = $oXmlObject->createElementNS('http://www.w3.org/1999/xhtml', 'xhtml:link');
-                    $oNode->setAttribute('rel', 'alternate');
-                    $oNode->setAttribute('hreflang', $oAlternate->getLang());
-                    $oNode->setAttribute('href', $oAlternate->getUrl());
-                    $oUrl->appendChild($oNode);
-                }
-
-                $oUrlSet->appendChild($oUrl);
+                $this->addItem($oXmlObject, $oUrlSet, $oItem);
             }
         }
 
@@ -128,5 +129,38 @@ class SiteMap
         if (!$oXmlObject->save(static::SITEMAP_DIR . static::SITEMAP_FILE)) {
             throw new WriteException('Failed to write sitemap.xml file');
         }
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * Add an item to the sitemap
+     *
+     * @param \DOMDocument $oXmlObject The Sitemap document
+     * @param \DOMElement  $oUrlSet    The URLset element
+     * @param Url          $oItem      The URL to add
+     *
+     * @return $this
+     */
+    protected function addItem(DOMDocument $oXmlObject, \DOMElement $oUrlSet, Url $oItem): self
+    {
+        $oUrl = $oXmlObject->createElement('url');
+        $oUrl->appendChild($oXmlObject->createElement('loc', $oItem->getUrl()));
+        $oUrl->appendChild($oXmlObject->createElement('lastmod', $oItem->getModified()));
+        $oUrl->appendChild($oXmlObject->createElement('changefreq', $oItem->getChangeFrequency()));
+        $oUrl->appendChild($oXmlObject->createElement('priority', (string) $oItem->getPriority()));
+
+        $aAlternates = $oItem->getAlternates();
+        foreach ($aAlternates as $oAlternate) {
+            $oNode = $oXmlObject->createElementNS('http://www.w3.org/1999/xhtml', 'xhtml:link');
+            $oNode->setAttribute('rel', 'alternate');
+            $oNode->setAttribute('hreflang', $oAlternate->getLang());
+            $oNode->setAttribute('href', $oAlternate->getUrl());
+            $oUrl->appendChild($oNode);
+        }
+
+        $oUrlSet->appendChild($oUrl);
+
+        return $this;
     }
 }
