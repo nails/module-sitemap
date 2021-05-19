@@ -73,7 +73,8 @@ class SiteMap
 
             $aClasses = $oComponent
                 ->findClasses('SiteMap\Generator')
-                ->whichImplement(Generator::class);
+                ->whichImplement(Generator::class)
+                ->whichCanBeInstantiated();
 
             foreach ($aClasses as $sClass) {
                 $aGenerators[] = $sClass;
