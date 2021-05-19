@@ -75,11 +75,11 @@ class Url
     /**
      * Gets the URL
      *
-     * @return string|null
+     * @return string
      */
-    public function getUrl(): ?string
+    public function getUrl(): string
     {
-        return $this->sUrl;
+        return siteUrl($this->sUrl);
     }
 
     // --------------------------------------------------------------------------

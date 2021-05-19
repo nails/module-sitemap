@@ -100,14 +100,11 @@ class SiteMap
         $oUrlSet->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         $oUrlSet->setAttribute('xsi:schemaLocation', 'http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd');
 
-        //  Homepage
         /** @var Url $oHomepage */
         $oHomepage = Factory::factory('Url', Constants::MODULE_SLUG);
-        $oHomepage->setUrl(siteUrl());
 
         $this->addItem($oXmlObject, $oUrlSet, $oHomepage);
 
-        //  Generators
         foreach (static::$aGenerators as $sGeneratorClass) {
 
             $oGenerator = new $sGeneratorClass();
