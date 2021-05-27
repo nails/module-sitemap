@@ -16,7 +16,7 @@ use Nails\SiteMap\Constants;
 use SimpleXMLElement;
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Helper;
-use Nails\Common\Service\Session;
+use Nails\Common\Service\UserFeedback;
 use Nails\Factory;
 
 class Sitemap extends Base
@@ -100,9 +100,9 @@ class Sitemap extends Base
         $oService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $oService->write();
 
-        /** @var Session $oSession */
-        $oSession = Factory::service('Session');
-        $oSession->setFlashData('success', 'Sitemap generated successfully.');
+        /** @var UserFeedback $oUserFeedback */
+        $oUserFeedback = Factory::service('UserFeedback');
+        $oUserFeedback->success('Sitemap generated successfully.');
 
         redirect('admin/sitemap/sitemap');
     }
