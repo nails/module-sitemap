@@ -16,9 +16,13 @@ use Nails\SiteMap\Constants;
 use SimpleXMLElement;
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Helper;
-use Nails\Common\Service\UserFeedback;
 use Nails\Factory;
 
+/**
+ * Class Sitemap
+ *
+ * @package Nails\Admin\Sitemap
+ */
 class Sitemap extends Base
 {
     /**
@@ -77,7 +81,7 @@ class Sitemap extends Base
             }
 
         } catch (\Exception $e) {
-            $this->data['error'] = $e->getMessage();
+            $this->oUserFeedback->error($e->getMessage());
         }
 
         $this->data['page']->title = 'Sitemap: View';
@@ -97,12 +101,11 @@ class Sitemap extends Base
             show404();
         }
 
+        /** @var \Nails\SiteMap\Service\SiteMap $oService */
         $oService = Factory::service('SiteMap', Constants::MODULE_SLUG);
         $oService->write();
 
-        /** @var UserFeedback $oUserFeedback */
-        $oUserFeedback = Factory::service('UserFeedback');
-        $oUserFeedback->success('Sitemap generated successfully.');
+        $this->oUserFeedback->success('Sitemap generated successfully.');
 
         redirect('admin/sitemap/sitemap');
     }
