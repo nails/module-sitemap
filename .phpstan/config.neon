@@ -5,3 +5,5 @@ parameters:
         - ../tests
     bootstrapFiles:
         - constants.php
+    scanFiles:
+        - ../vendor/nails/common/helpers/url.php
