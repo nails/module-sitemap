@@ -3,8 +3,10 @@
 namespace Nails\SiteMap\Factory;
 
 use Nails\Common\Exception\NailsException;
+use Nails\Common\Resource\DateTime;
 use Nails\Factory;
 use Nails\SiteMap\Constants;
+use Nails\SiteMap\Exception\SiteMapException;
 
 /**
  * Class Url
@@ -87,13 +89,33 @@ class Url
     /**
      * Sets the modified date
      *
-     * @param string $sModified The modified date
+     * @param string|\DateTime|DateTime $mModified The modified date
      *
      * @return $this
+     * @throws \Nails\SiteMap\Exception\SiteMapException
      */
-    public function setModified(string $sModified): self
+    public function setModified($mModified): self
     {
-        $this->sModified = $sModified;
+        if ($mModified instanceof \DateTime || $mModified instanceof DateTime) {
+            $this->sModified = $mModified->format('c');
+
+        } elseif (is_string($mModified)) {
+            $this->sModified = $mModified;
+
+        } else {
+            throw new SiteMapException(
+                sprintf(
+                    'Expect %s got %s',
+                    implode('|', [
+                        'string',
+                        \DateTime::class,
+                        DateTime::class,
+                    ]),
+                    gettype($mModified)
+                )
+            );
+        }
+
         return $this;
     }
 
