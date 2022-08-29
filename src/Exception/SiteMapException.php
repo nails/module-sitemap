@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WriteException Exception
+ * SiteMap Exception
  *
  * @package     Nails
  * @subpackage  module-sitemap
@@ -12,6 +12,8 @@
 
 namespace Nails\SiteMap\Exception;
 
-class WriteException extends SiteMapException
+use Nails\Common\Exception\NailsException;
+
+class SiteMapException extends NailsException
 {
 }
