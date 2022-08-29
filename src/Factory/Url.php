@@ -199,6 +199,7 @@ class Url
      * @param string $sLang The language of the alternate URL
      *
      * @return $this
+     * @throws \Nails\Common\Exception\FactoryException
      */
     public function setAlternate(string $sUrl, string $sLang): self
     {

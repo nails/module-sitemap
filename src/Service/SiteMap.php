@@ -12,6 +12,8 @@
 namespace Nails\SiteMap\Service;
 
 use DOMDocument;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Exception\NailsException;
 use Nails\Components;
 use Nails\Factory;
 use Nails\SiteMap\Constants;
@@ -47,7 +49,7 @@ class SiteMap
      *
      * @var Generator[]
      */
-    protected static $aGenerators = [];
+    protected static array $aGenerators = [];
 
     // --------------------------------------------------------------------------
 
@@ -65,6 +67,7 @@ class SiteMap
      * Returns the available generators
      *
      * @return Generator[]
+     * @throws NailsException
      */
     public static function getGenerators(): array
     {
@@ -89,6 +92,8 @@ class SiteMap
     /**
      * Writes the sitemap file
      *
+     * @throws \DOMException
+     * @throws FactoryException
      * @throws WriteException
      */
     public function write(): void
@@ -139,6 +144,7 @@ class SiteMap
      * @param Url          $oItem      The URL to add
      *
      * @return $this
+     * @throws \DOMException
      */
     protected function addItem(DOMDocument $oXmlObject, \DOMElement $oUrlSet, Url $oItem): self
     {
