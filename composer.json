@@ -27,6 +27,7 @@
     "prefer-stable": true,
     "require":
     {
+        "ext-dom": "*",
         "nails/common": "dev-develop",
         "nails/module-console": "dev-develop"
     },
