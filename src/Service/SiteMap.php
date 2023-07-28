@@ -96,7 +96,7 @@ class SiteMap
      * @throws FactoryException
      * @throws WriteException
      */
-    public function write(): void
+    public function write(string $sFile = null): void
     {
         //  Begin XML
         $oXmlObject = new DOMDocument('1.0', 'UTF-8');
@@ -129,8 +129,11 @@ class SiteMap
 
         $oXmlObject->appendChild($oUrlSet);
         $oXmlObject->formatOutput = true;
-        if (!$oXmlObject->save(static::SITEMAP_DIR . static::SITEMAP_FILE)) {
-            throw new WriteException('Failed to write sitemap.xml file');
+
+        $sFile = $sFile ?? static::SITEMAP_DIR . static::SITEMAP_FILE;
+
+        if (!$oXmlObject->save($sFile)) {
+            throw new WriteException('Failed tos write to ' . $sFile);
         }
     }
 
