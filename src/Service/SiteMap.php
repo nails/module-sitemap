@@ -96,7 +96,7 @@ class SiteMap
      * @throws FactoryException
      * @throws WriteException
      */
-    public function write(string $sFile = null): void
+    public function write(?string $sFile = null): void
     {
         //  Begin XML
         $oXmlObject = new DOMDocument('1.0', 'UTF-8');
