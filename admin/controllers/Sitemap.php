@@ -12,11 +12,12 @@
 
 namespace Nails\Admin\Sitemap;
 
-use Nails\SiteMap\Constants;
-use SimpleXMLElement;
 use Nails\Admin\Controller\Base;
+use Nails\Admin\Factory\Nav;
 use Nails\Admin\Helper;
 use Nails\Factory;
+use Nails\SiteMap\Constants;
+use SimpleXMLElement;
 
 /**
  * Class Sitemap
@@ -27,10 +28,8 @@ class Sitemap extends Base
 {
     /**
      * Defines the admin controller
-     *
-     * @return array
      */
-    public static function announce()
+    public static function announce(): Nav|array|null
     {
         $oNav = Factory::factory('Nav', \Nails\Admin\Constants::MODULE_SLUG)
             ->setLabel('Sitemap');
