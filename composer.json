@@ -27,6 +27,7 @@
     "prefer-stable": true,
     "require":
     {
+        "php": ">=8.3",
         "ext-dom": "*",
         "nails/common": "dev-develop",
         "nails/module-console": "dev-develop"
