@@ -10,19 +10,20 @@
  * @link
  */
 
-namespace Nails\Admin\Sitemap;
+namespace Nails\SiteMap\Admin\Controller;
 
 use Nails\Admin\Controller\Base;
 use Nails\Admin\Factory\Nav;
 use Nails\Admin\Helper;
 use Nails\Factory;
+use Nails\SiteMap\Admin\Permission;
 use Nails\SiteMap\Constants;
 use SimpleXMLElement;
 
 /**
  * Class Sitemap
  *
- * @package Nails\Admin\Sitemap
+ * @package Nails\SiteMap\Admin\Controller
  */
 class Sitemap extends Base
 {
@@ -34,26 +35,11 @@ class Sitemap extends Base
         $oNav = Factory::factory('Nav', \Nails\Admin\Constants::MODULE_SLUG)
             ->setLabel('Sitemap');
 
-        if (userHasPermission('admin:sitemap:sitemap:view')) {
+        if (userHasPermission(Permission\View::class)) {
             $oNav->addAction('View Sitemap');
         }
 
         return $oNav;
-    }
-
-    // --------------------------------------------------------------------------
-
-    /**
-     * Returns an array of permissions which can be configured for the user
-     *
-     * @return array
-     */
-    public static function permissions(): array
-    {
-        return parent::permissions() + [
-                'view'     => 'View the sitemap',
-                'generate' => 'Generate the sitemap on demand',
-            ];
     }
 
     // --------------------------------------------------------------------------
@@ -96,7 +82,7 @@ class Sitemap extends Base
      */
     public function generate()
     {
-        if (!userHasPermission('admin:sitemap:sitemap:generate')) {
+        if (!userHasPermission(Permission\Generate::class)) {
             show404();
         }
 
@@ -106,6 +92,6 @@ class Sitemap extends Base
 
         $this->oUserFeedback->success('Sitemap generated successfully.');
 
-        redirect('admin/sitemap/sitemap');
+        redirect(static::url());
     }
 }
