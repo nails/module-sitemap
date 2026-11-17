@@ -34,10 +34,10 @@
 </table>
 <?php
 
-if (userHasPermission('admin:sitemap:sitemap:generate')) {
+if (userHasPermission(\Nails\SiteMap\Admin\Permission\Generate::class)) {
     echo '<hr>';
     echo anchor(
-        'admin/sitemap/sitemap/generate',
+        \Nails\SiteMap\Admin\Controller\Sitemap::url('generate'),
         'Re-generate Sitemap',
         'class="btn btn-primary"'
     );
